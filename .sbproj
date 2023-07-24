@@ -1,0 +1,19 @@
+{
+  "Title": "Poly Haven HDRI Porting",
+  "Type": "tool",
+  "Org": "local",
+  "Ident": "poly_haven_hdri_porting",
+  "Tags": null,
+  "Schema": 1,
+  "HasAssets": true,
+  "AssetsPath": "",
+  "Resources": null,
+  "MenuResources": null,
+  "HasCode": true,
+  "CodePath": "code",
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Metadata": {
+    "ProjectTemplate": null
+  }
+}
