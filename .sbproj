@@ -1,7 +1,7 @@
 {
   "Title": "Poly Haven HDRI Porting",
   "Type": "tool",
-  "Org": "local",
+  "Org": "polyhaven",
   "Ident": "poly_haven_hdri_porting",
   "Tags": null,
   "Schema": 1,
@@ -14,6 +14,15 @@
   "PackageReferences": [],
   "EditorReferences": null,
   "Metadata": {
-    "ProjectTemplate": null
+    "ProjectTemplate": null,
+    "CsProjName": "",
+    "Compiler": {
+      "RootNamespace": "PolyHaven",
+      "DefineConstants": "SANDBOX;ADDON;DEBUG",
+      "NoWarn": "1701;1702;1591;",
+      "Nullables": true,
+      "References": [],
+      "DistinctReferences": []
+    }
   }
 }
