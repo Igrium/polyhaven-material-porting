@@ -5,13 +5,15 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
+using Editor;
 using PolyHaven.API;
+using PolyHaven.Pipeline;
 using Sandbox;
 using Sandbox.Diagnostics;
 
 namespace PolyHaven;
 
-public static class HDRIPorting
+public static class Commands
 {
 	public static ApiManager APIManager { get; set; } = new ApiManager();
 
@@ -63,4 +65,46 @@ public static class HDRIPorting
 		}
 	}
 
+	[ConCmd.Engine("print_active_project")]
+	public static void PrintActiveProject()
+	{
+		PolySettings.Instance.ReloadActiveProject();
+		Log.Info( PolySettings.Instance.ActiveProject );
+	}
+
+	[ConCmd.Engine("polyhaven_reload")]
+	public static void ReloadConfig()
+	{
+		PolySettings.Reload();
+		Log.Info( "Settings reloaded." );
+	}
+
+	[ConCmd.Engine("polyhaven_download")]
+	public async static void TestDownload(string id)
+	{
+		var asset = await PolyAsset.Create( id );
+		await asset.DownloadHDR();
+	}
+
+	[ConCmd.Engine("polyhaven_compile")]
+	public async static void TestCompile(string id)
+	{
+		var asset = await PolyAsset.Create( id );
+		await asset.DownloadHDR();
+		asset.GenerateMaterial();
+		asset.SetupMetadata();
+	}
+
+	[ConCmd.Engine("list_files")]
+	public static void TestFile()
+	{
+		Log.Info( "showing files" );
+		string files = "";
+		foreach(var file in FileSystem.Content.FindFile( "", recursive: true ))
+		{
+			files += file + '\n';
+		}
+		FileSystem.Root.WriteAllText( "assets.txt", files );
+		Log.Info( "Wrote to " + FileSystem.Root.GetFullPath( "assets.txt" ));
+	}
 }

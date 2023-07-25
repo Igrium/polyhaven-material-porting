@@ -18,6 +18,8 @@ namespace PolyHaven.API;
 
 public class ApiManager
 {
+	public static readonly ApiManager Instance = new ApiManager();
+
 	public HttpClient Client { get; set; } = new HttpClient()
 	{
 		BaseAddress = new Uri( "https://api.polyhaven.com" )
