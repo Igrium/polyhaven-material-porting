@@ -93,6 +93,7 @@ public static class Commands
 		await asset.DownloadHDR();
 		asset.GenerateMaterial();
 		asset.SetupMetadata();
+		await asset.Publish();
 	}
 
 	[ConCmd.Engine("list_files")]

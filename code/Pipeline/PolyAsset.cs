@@ -92,14 +92,21 @@ public class PolyAsset
 		Material.Publishing.ProjectConfig.Ident = PolyHavenID;
 		Material.Publishing.ProjectConfig.Title = Asset.Name;
 		Material.Publishing.ProjectConfig.Tags = string.Join( ' ', ReplaceSpaces( Asset.Tags ) );
+		Material.Publishing.ProjectConfig.Org = "polyhaven";
 		Material.Publishing.Save();
 	}
 
-	public async void Publish()
+	public async Task Publish()
 	{
 		Log.Info( "Setting up asset publish" );
 		var publisher = await ProjectPublisher.FromAsset( Material );
 		publisher.SetMeta( "polyhaven_id", PolyHavenID );
+		await publisher.PrePublish();
+
+		foreach (var file in publisher.Files)
+		{
+			Log.Info( file );
+		}
 	}
 
 	private IEnumerable<string> ReplaceSpaces(IEnumerable<string> src)
