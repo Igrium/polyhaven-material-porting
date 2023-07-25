@@ -91,8 +91,10 @@ public static class Commands
 	{
 		var asset = await PolyAsset.Create( id );
 		await asset.DownloadHDR();
+
+		var thumbTask = ThumbnailGenerator.GenerateThumbnail( asset );
 		asset.GenerateMaterial();
-		await ThumbnailGenerator.GenerateThumbnail( asset );
+		await thumbTask;
 
 		asset.SetupMetadata();
 		await asset.Publish();
