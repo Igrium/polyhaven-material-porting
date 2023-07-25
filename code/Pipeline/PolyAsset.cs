@@ -96,19 +96,6 @@ public class PolyAsset
 		Material.Publishing.Save();
 	}
 
-	public async Task Publish()
-	{
-		Log.Info( "Setting up asset publish" );
-		var publisher = await ProjectPublisher.FromAsset( Material );
-		publisher.SetMeta( "polyhaven_id", PolyHavenID );
-		await publisher.PrePublish();
-
-		foreach (var file in publisher.Files)
-		{
-			Log.Info( file );
-		}
-	}
-
 	private IEnumerable<string> ReplaceSpaces(IEnumerable<string> src)
 	{
 		foreach ( string s in src )

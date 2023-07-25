@@ -97,7 +97,8 @@ public static class Commands
 		await thumbTask;
 
 		asset.SetupMetadata();
-		await asset.Publish();
+		await AssetPublishing.Publish( asset );
+		Log.Info( "Skybox generation complete!" );
 	}
 
 	[ConCmd.Engine("list_files")]
