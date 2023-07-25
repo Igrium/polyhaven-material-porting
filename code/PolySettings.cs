@@ -28,6 +28,8 @@ public class PolySettings
 		}
 	}
 
+	public string BlenderPath { get; set; } = "";
+
 	private LocalProject? _activeProject;
 
 	[JsonIgnore]

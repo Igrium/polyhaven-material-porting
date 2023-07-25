@@ -3,6 +3,7 @@ import time
 import sys
 
 def setup_material(filepath: str):
+    print("Setting material to " + filepath)
     image = bpy.data.images['SKY']
     image.source = 'FILE'
     image.filepath = filepath
