@@ -28,6 +28,7 @@ public static class AssetPublishing
 		publisher.SetChangeDetails( "Auto-generated upload", "" );
 		await publisher.Publish();
 		Log.Info( "Published to " + project.ViewUrl );
+		
 	}
 
 	static async Task DoUploads( LocalProject project, ProjectPublisher publisher )

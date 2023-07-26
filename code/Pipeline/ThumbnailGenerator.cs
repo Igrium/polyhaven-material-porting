@@ -1,5 +1,6 @@
 ﻿using Editor;
 using PolyHaven.Util;
+using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,7 +28,7 @@ public class ThumbnailGenerator
 			throw new InvalidOperationException( "No active project." );
 
 		string globalExrPath = Path.Combine( activeProject.GetAssetsPath(), exrPath );
-		string outputPath = $"materials/skybox/thumbnails/{name}.jpg";
+		string outputPath = $"materials/skybox/thumbnails/{name}.png";
 		string globalOutputPath = Path.Combine( activeProject.GetAssetsPath(), outputPath );
 
 		var blendFile = FileSystem.Content.GetFullPath( "skies.blend" );
@@ -38,6 +39,17 @@ public class ThumbnailGenerator
 
 		Log.Info( "Saved thumbnail to " + outputPath );
 		return outputPath;
+	}
+
+	public static void AssignThumbnail(Asset asset, string thumbPath)
+	{
+		var fullPath = FileSystem.Content.GetFullPath( thumbPath );
+		if (fullPath == null)
+		{
+			Log.Warning( "Unable to find thumbnail: " + thumbPath );
+		}
+		Pixmap thumbnail = Pixmap.FromFile( fullPath );
+		asset.OverrideThumbnail( thumbnail );
 	}
 
 	protected static async Task RunBlenderProcess( string exrInput, string imageOutput, string blendFile )

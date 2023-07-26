@@ -94,7 +94,9 @@ public static class Commands
 
 		var thumbTask = ThumbnailGenerator.GenerateThumbnail( asset );
 		asset.GenerateMaterial();
-		await thumbTask;
+		var thumb = await thumbTask;
+		if ( thumb != null && asset.Material != null )
+			ThumbnailGenerator.AssignThumbnail( asset.Material, thumb );
 
 		asset.SetupMetadata();
 		await AssetPublishing.Publish( asset );
