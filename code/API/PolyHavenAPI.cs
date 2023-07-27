@@ -16,9 +16,9 @@ using static PolyHaven.API.DeserializationBullshit;
 
 namespace PolyHaven.API;
 
-public class ApiManager
+public class PolyHavenAPI
 {
-	public static readonly ApiManager Instance = new ApiManager();
+	public static readonly PolyHavenAPI Instance = new PolyHavenAPI();
 
 	public HttpClient Client { get; set; } = new HttpClient()
 	{
@@ -36,6 +36,12 @@ public class ApiManager
 		var dict = await Client.GetFromJsonAsync<Dictionary<string, AssetEntry>>( url );
 
 		return dict != null ? dict : new();
+	}
+
+	public async Task<AssetEntry> GetAsset(string assetID)
+	{
+		var url = "info/" + assetID;
+		return await Client.GetFromJsonAsync<AssetEntry>( url );
 	}
 
 	/// <summary>

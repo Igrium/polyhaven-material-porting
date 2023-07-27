@@ -12,7 +12,7 @@ namespace PolyHaven.API;
 
 public struct FileReference
 {
-	public int Size { get; set; }
+	public UInt64 Size { get; set; }
 	public string MD5 { get; set; }
 	public string URL { get; set; }
 

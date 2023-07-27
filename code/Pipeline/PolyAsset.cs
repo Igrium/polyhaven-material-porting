@@ -31,7 +31,7 @@ public class PolyAsset
 		if ( activeProject == null )
 			throw new InvalidOperationException( "no active project." );
 
-		var resolutions = await ApiManager.Instance.GetHDRFiles( PolyHavenID );
+		var resolutions = await PolyHavenAPI.Instance.GetHDRFiles( PolyHavenID );
 
 		if ( !resolutions.TryGetValue( resolution, out var fileRef ) )
 		{
@@ -112,15 +112,10 @@ public class PolyAsset
 	/// <exception cref="ArgumentException">If the ID cannot be found.</exception>
 	public static async Task<PolyAsset> Create( string polyHavenID )
 	{
-		var assets = await ApiManager.Instance.GetAssets( "hdris" );
+		AssetEntry entry = await PolyHavenAPI.Instance.GetAsset( polyHavenID );
+		if ( entry.Type != API.AssetType.HDRI )
+			throw new ArgumentException( "The supplied asset must be an HDRI.", nameof( polyHavenID ) );
 
-		if ( assets.TryGetValue( polyHavenID, out var entry ) )
-		{
-			return new PolyAsset( polyHavenID, entry );
-		}
-		else
-		{
-			throw new ArgumentException( "Unknown polyhaven ID: " + polyHavenID, nameof( polyHavenID ) );
-		}
+		return new PolyAsset( polyHavenID, entry );
 	}
 }

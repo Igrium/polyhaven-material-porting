@@ -15,7 +15,7 @@ namespace PolyHaven;
 
 public static class Commands
 {
-	public static ApiManager APIManager { get; set; } = new ApiManager();
+	public static PolyHavenAPI APIManager { get; set; } = new PolyHavenAPI();
 
 	[ConCmd.Engine("test_request")]
 	public async static void TestRequest()
