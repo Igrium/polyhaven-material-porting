@@ -103,7 +103,7 @@ public static class Commands
 		asset.SetupMetadata();
 		await AssetPublishing.Publish( asset );
 		Log.Info( "Skybox generation complete!" );
-		Log.Info( JsonSerializer.Serialize( new AssetMeta( asset ) ) );
+		MetaServer.Send( new AssetMeta( asset ) );
 	}
 
 	[ConCmd.Engine( "list_files" )]
