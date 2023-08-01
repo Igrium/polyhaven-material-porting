@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Editor;
 using PolyHaven.API;
+using PolyHaven.AssetParty;
 using PolyHaven.Meta;
 using PolyHaven.Pipeline;
 using Sandbox;
@@ -91,19 +92,27 @@ public static class Commands
 	[ConCmd.Engine( "polyhaven_compile" )]
 	public async static void TestCompile( string id )
 	{
-		var asset = await PolyAsset.Create( id );
-		await asset.DownloadHDR();
+		await AssetCompilePipeline.DoCompile( id );
+	}
 
-		var thumbTask = ThumbnailGenerator.GenerateThumbnail( asset );
-		asset.GenerateMaterial();
-		var thumb = await thumbTask;
-		if ( thumb != null && asset.Material != null )
-			ThumbnailGenerator.AssignThumbnail( asset.Material, thumb );
+	[ConCmd.Engine( "polyhaven_list" )]
+	public async static void ListExistingFiles()
+	{
+		var packages = await AssetPartyProxy.ExistingPackages();
+		foreach ( var package in packages )
+		{
+			Log.Info( "package: " + package.Ident );
+		}
+	}
 
-		asset.SetupMetadata();
-		await AssetPublishing.Publish( asset );
-		Log.Info( "Skybox generation complete!" );
-		MetaServer.Send( new AssetMeta( asset ) );
+	[ConCmd.Engine("polyhaven_listunfinished")]
+	public async static void ListUnfinished()
+	{
+		var unfinished = await AssetCompilePipeline.GetUnfinishedAssets();
+		foreach (var id in unfinished.Keys)
+		{
+			Log.Info( id );
+		}
 	}
 
 	[ConCmd.Engine( "list_files" )]

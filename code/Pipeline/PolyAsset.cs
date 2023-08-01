@@ -24,6 +24,7 @@ public class PolyAsset
 	{
 		PolyHavenID = polyHavenID;
 		Asset = asset;
+		asset.Tags.Add( "skybox" );
 
 	}
 
