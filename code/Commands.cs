@@ -115,6 +115,18 @@ public static class Commands
 		}
 	}
 
+	[ConCmd.Engine("polyhaven_masscompile")]
+	public async static void DoCompile()
+	{
+		await AssetCompilePipeline.DoMassCompile();
+	}
+
+	[ConCmd.Engine("polyhaven_stop")]
+	public static void StopCompile()
+	{
+		AssetCompilePipeline.StopCompile();
+	}
+
 	[ConCmd.Engine( "list_files" )]
 	public static void TestFile()
 	{

@@ -44,7 +44,7 @@ public static class AssetCompilePipeline
 	/// <returns>A map of asset ids and their relevent entries.</returns>
 	public static async Task<IDictionary<string, AssetEntry>> GetUnfinishedAssets()
 	{
-		var assets = await PolyHavenAPI.Instance.GetAssets();
+		var assets = await PolyHavenAPI.Instance.GetAssets("hdris");
 		var uploadedAssets = await AssetPartyProxy.ExistingPackages();
 
 		var filteredAssets = new Dictionary<string, AssetEntry>();
@@ -60,7 +60,7 @@ public static class AssetCompilePipeline
 
 	private static bool ShouldStop = false;
 
-	public static async void DoMassCompile()
+	public static async Task DoMassCompile()
 	{
 		Log.Info( "Starting mass compile." );
 		Log.Info( "Searching for unported assets..." );
@@ -70,7 +70,14 @@ public static class AssetCompilePipeline
 
 		foreach ( var asset in assets )
 		{
-
+			if ( ShouldStop ) return;
+			Log.Info( $"Begining port for {asset.Key}" );
+			await DoCompile( asset.Key, asset.Value );
 		}
+	}
+
+	public static void StopCompile()
+	{
+		ShouldStop = true;
 	}
 }
