@@ -28,8 +28,15 @@ public class Server {
         app = Javalin.create(config -> {
             config.jsonMapper(gsonMapper);
         });
-        
+        app.post("/submit", ctx -> {
+            onSubmit(ctx.bodyAsClass(AssetMeta.class));
+        });
 
+        app.start();
+        System.out.println("Server started on port " + app.port());
+    }
+
+    protected void onSubmit(AssetMeta meta) {
         
     }
 
