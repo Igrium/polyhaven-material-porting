@@ -8,7 +8,7 @@
             "type": "java",
             "name": "Launch Server",
             "request": "launch",
-            "mainClass": "metadata_server.App",
+            "mainClass": "com.igrium.metadata_server.MainWindow",
             "projectName": "app",
             "console": "internalConsole"
         }
