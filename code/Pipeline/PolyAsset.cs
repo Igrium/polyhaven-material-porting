@@ -92,7 +92,14 @@ public class PolyAsset
 		Material.MetaData.Set( "polyhaven_id", PolyHavenID );
 		Material.Publishing.CreateTemporaryProject();
 
-		Material.Publishing.ProjectConfig.Ident = PolyHavenID;
+		// Indents may not be longer than 32 characters.
+		string indent = PolyHavenID;
+		if (indent.Length > 32)
+		{
+			indent = new Random().NextStrings( 16, 1, allowedChars: RandomCharacters.INDENT_ALLOWED_CHARACTERS ).First();
+		}
+
+		Material.Publishing.ProjectConfig.Ident = indent;
 		Material.Publishing.ProjectConfig.Title = Asset.Name;
 		Material.Publishing.ProjectConfig.Tags = string.Join( ' ', ReplaceSpaces( Asset.Tags ) );
 		Material.Publishing.ProjectConfig.Org = "polyhaven";
@@ -103,7 +110,7 @@ public class PolyAsset
 	{
 		foreach ( string s in src )
 		{
-			yield return s.Replace( ' ', '_' );
+			yield return s.Replace( ' ', '-' );
 		}
 	}
 

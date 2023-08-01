@@ -44,7 +44,7 @@ public static class AssetCompilePipeline
 	/// <returns>A map of asset ids and their relevent entries.</returns>
 	public static async Task<IDictionary<string, AssetEntry>> GetUnfinishedAssets()
 	{
-		var assets = await PolyHavenAPI.Instance.GetAssets("hdris");
+		var assets = await PolyHavenAPI.Instance.GetAssets( "hdris" );
 		var uploadedAssets = await AssetPartyProxy.ExistingPackages();
 
 		var filteredAssets = new Dictionary<string, AssetEntry>();
@@ -53,7 +53,6 @@ public static class AssetCompilePipeline
 			if ( !(await AssetPartyProxy.PackageExists( kv.Key, uploadedAssets )) )
 				filteredAssets.Add( kv.Key, kv.Value );
 		}
-
 
 		return filteredAssets;
 	}
@@ -72,9 +71,19 @@ public static class AssetCompilePipeline
 		foreach ( var asset in assets )
 		{
 			if ( ShouldStop ) return;
-			Log.Info( $"Begining port for {asset.Key}" );
-			await DoCompile( asset.Key, asset.Value );
+			try
+			{
+				Log.Info( $"Begining port for {asset.Key}" );
+				await DoCompile( asset.Key, asset.Value );
+			}
+			catch ( Exception ex )
+			{
+				await ErrorHandling.writeError( asset.Key, ex );
+				Log.Error( $"Error converting {asset.Key}:" );
+				Log.Error( ex );
+			}
 		}
+
 	}
 
 	public static void StopCompile()
