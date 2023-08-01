@@ -16,7 +16,7 @@ public class ScreenshotManager {
         System.out.println("Saving screenshot for " + id + " to " + dest.getAbsolutePath());
         URL url;
         try {
-            url = new URL("https://cdn.polyhaven.com/asset_img/thumbs/" + id + ".png");
+            url = new URL("https://cdn.polyhaven.com/asset_img/primary/" + id + ".png?height=720");
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
