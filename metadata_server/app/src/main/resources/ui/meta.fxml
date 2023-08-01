@@ -13,7 +13,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="650.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.igrium.metadata_server.ui.MetaUI">
    <children>
       <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="ALWAYS">
@@ -61,6 +60,7 @@
       <ButtonBar prefHeight="40.0" prefWidth="200.0">
         <buttons>
             <Button fx:id="openButton" mnemonicParsing="false" onAction="#openWeb" text="Open" />
+            <Button fx:id="screenshotButton" disable="true" mnemonicParsing="false" onAction="#openScreenshot" text="Screenshot" />
           <Button fx:id="doneButton" mnemonicParsing="false" text="Done" />
         </buttons>
          <padding>

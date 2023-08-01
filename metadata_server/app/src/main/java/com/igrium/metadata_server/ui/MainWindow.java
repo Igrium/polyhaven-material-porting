@@ -46,6 +46,7 @@ public class MainWindow {
                 rootPane.setBottom(uiPair.getValue());
 
                 uiPair.getKey().getDoneButton().setOnMouseClicked(e -> {
+                    uiPair.getKey().onCLose();
                     queue.getItems().remove(newValue);
                 });
             }
