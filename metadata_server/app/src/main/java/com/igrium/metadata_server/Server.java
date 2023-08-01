@@ -2,6 +2,7 @@ package com.igrium.metadata_server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.igrium.metadata_server.asset.AssetMeta;
 import com.igrium.metadata_server.ui.AppUI;
 
 import io.javalin.Javalin;
@@ -48,7 +49,7 @@ public class Server {
 
     protected void onSubmit(AssetMeta meta) {
         Platform.runLater(() -> {
-            AppUI.getInstance().getMainWindow().queueItems().add(meta.assetEntry().name());
+            AppUI.getInstance().getMainWindow().queueItems().add(meta);
         });
     }
 

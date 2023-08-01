@@ -1,4 +1,4 @@
-package com.igrium.metadata_server;
+package com.igrium.metadata_server.asset;
 
 import java.util.List;
 import java.util.Map;
