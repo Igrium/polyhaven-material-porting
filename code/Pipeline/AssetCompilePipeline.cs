@@ -62,6 +62,7 @@ public static class AssetCompilePipeline
 
 	public static async Task DoMassCompile()
 	{
+		ShouldStop = false;
 		Log.Info( "Starting mass compile." );
 		Log.Info( "Searching for unported assets..." );
 
