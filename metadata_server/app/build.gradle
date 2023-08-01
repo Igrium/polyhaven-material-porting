@@ -14,7 +14,7 @@ plugins {
 
 javafx {
     version = '20'
-    modules = [ 'javafx.controls' ]
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 repositories {
