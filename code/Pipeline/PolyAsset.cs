@@ -18,6 +18,8 @@ public class PolyAsset
 	public string? SourceTexturePath { get; protected set; }
 	public Asset? Material { get; protected set; }
 
+	public string? AssetPartyURL { get; set; }
+
 	public PolyAsset( string polyHavenID, AssetEntry asset )
 	{
 		PolyHavenID = polyHavenID;

@@ -42,8 +42,12 @@ public class MainWindow {
                 }
 
                 var uiPair = MetaUI.create();
-                uiPair.getKey().PopulateFields(newValue);
+                uiPair.getKey().Load(newValue);
                 rootPane.setBottom(uiPair.getValue());
+
+                uiPair.getKey().getDoneButton().setOnMouseClicked(e -> {
+                    queue.getItems().remove(newValue);
+                });
             }
 
         });

@@ -15,10 +15,13 @@ public struct AssetMeta
 
 	[JsonPropertyName("poly_id")]
 	public string PolyID { get; set; }
+	[JsonPropertyName("asset_party_url")]
+	public string? AssetPartyURL { get; set; }
 
 	public AssetMeta(PolyAsset asset)
 	{
 		AssetEntry = asset.Asset;
 		PolyID = asset.PolyHavenID;
+		AssetPartyURL = asset.AssetPartyURL;
 	}
 }

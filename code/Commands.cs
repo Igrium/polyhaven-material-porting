@@ -101,9 +101,9 @@ public static class Commands
 			ThumbnailGenerator.AssignThumbnail( asset.Material, thumb );
 
 		asset.SetupMetadata();
-		Log.Info( JsonSerializer.Serialize( new AssetMeta( asset ) ) );
-		//await AssetPublishing.Publish( asset );
+		await AssetPublishing.Publish( asset );
 		Log.Info( "Skybox generation complete!" );
+		Log.Info( JsonSerializer.Serialize( new AssetMeta( asset ) ) );
 	}
 
 	[ConCmd.Engine( "list_files" )]
