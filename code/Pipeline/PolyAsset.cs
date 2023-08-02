@@ -98,10 +98,15 @@ public class PolyAsset
 		{
 			indent = new Random().NextStrings( 16, 1, allowedChars: RandomCharacters.INDENT_ALLOWED_CHARACTERS ).First();
 		}
+		var tags = new HashSet<string>();
+		foreach ( var tag in Asset.Tags )
+			tags.Add( tag );
+		foreach ( var tag in Asset.Categories )
+			tags.Add( tag );
 
 		Material.Publishing.ProjectConfig.Ident = indent;
 		Material.Publishing.ProjectConfig.Title = Asset.Name;
-		Material.Publishing.ProjectConfig.Tags = string.Join( ' ', ReplaceSpaces( Asset.Tags ) );
+		Material.Publishing.ProjectConfig.Tags = string.Join( ' ', ReplaceSpaces( tags ) );
 		Material.Publishing.ProjectConfig.Org = "polyhaven";
 		Material.Publishing.Save();
 	}

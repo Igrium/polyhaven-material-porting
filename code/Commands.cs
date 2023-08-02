@@ -90,9 +90,9 @@ public static class Commands
 	}
 
 	[ConCmd.Engine( "polyhaven_compile" )]
-	public async static void TestCompile( string id )
+	public async static void TestCompile( string id, bool publish = true )
 	{
-		await AssetCompilePipeline.DoCompile( id );
+		await AssetCompilePipeline.DoCompile( id, publish: publish );
 	}
 
 	[ConCmd.Engine( "polyhaven_list" )]

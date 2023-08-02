@@ -13,7 +13,7 @@ namespace PolyHaven.Pipeline;
 public static class AssetCompilePipeline
 {
 
-	public static async Task DoCompile( string id, AssetEntry? entry = null )
+	public static async Task DoCompile( string id, AssetEntry? entry = null, bool publish = true )
 	{
 		if ( entry == null )
 		{
@@ -32,8 +32,12 @@ public static class AssetCompilePipeline
 			ThumbnailGenerator.AssignThumbnail( asset.Material, thumb );
 
 		asset.SetupMetadata();
-		await AssetPublishing.Publish( asset );
-		MetaServer.Send( new AssetMeta( asset ) );
+		if (publish)
+		{
+			await AssetPublishing.Publish( asset );
+			MetaServer.Send( new AssetMeta( asset ) );
+		}
+
 		Log.Info( "Skybox generation complete!" );
 
 	}
