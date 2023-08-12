@@ -1,4 +1,5 @@
 ﻿using Editor;
+using PolyHaven.Assets;
 using Sandbox;
 using System;
 using System.Collections.Generic;
@@ -11,14 +12,14 @@ namespace PolyHaven.Pipeline;
 
 public static class AssetPublishing
 {
-	public static async Task Publish( PolyAsset asset )
+	public static async Task Publish( HDRIAsset asset )
 	{
-		if ( asset.Material == null )
+		if ( asset.SBoxAsset == null )
 			throw new InvalidOperationException( "Material has not been generated." );
 
 		Log.Info( "Publishing " + asset.PolyHavenID );
-		var project = asset.Material.Publishing.CreateTemporaryProject();
-		var publisher = await ProjectPublisher.FromAsset( asset.Material );
+		var project = asset.SBoxAsset.Publishing.CreateTemporaryProject();
+		var publisher = await ProjectPublisher.FromAsset( asset.SBoxAsset );
 		publisher.SetMeta( "polyhaven_id", asset.PolyHavenID );
 		await publisher.PrePublish();
 

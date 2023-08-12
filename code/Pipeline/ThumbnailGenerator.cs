@@ -1,4 +1,5 @@
 ﻿using Editor;
+using PolyHaven.Assets;
 using PolyHaven.Util;
 using Sandbox;
 using System;
@@ -13,7 +14,7 @@ namespace PolyHaven.Pipeline;
 
 public class ThumbnailGenerator
 {
-	public static Task<string> GenerateThumbnail( PolyAsset asset )
+	public static Task<string> GenerateThumbnail( HDRIAsset asset )
 	{
 		if ( asset.SourceTexturePath == null )
 			throw new InvalidOperationException( "Source texture has not been downloaded." );

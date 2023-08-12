@@ -1,5 +1,5 @@
 ﻿using PolyHaven.API;
-using PolyHaven.Pipeline;
+using PolyHaven.Assets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +20,11 @@ public struct AssetMeta
 
 	public string? Tags { get; set; }
 
-	public AssetMeta(PolyAsset asset)
+	public AssetMeta(HDRIAsset asset)
 	{
 		AssetEntry = asset.Asset;
 		PolyID = asset.PolyHavenID;
 		AssetPartyURL = asset.AssetPartyURL;
-		Tags = asset.Material?.Publishing?.ProjectConfig.Tags;
+		Tags = asset.SBoxAsset?.Publishing?.ProjectConfig.Tags;
 	}
 }

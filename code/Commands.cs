@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Editor;
 using PolyHaven.API;
 using PolyHaven.AssetParty;
+using PolyHaven.Assets;
 using PolyHaven.Meta;
 using PolyHaven.Pipeline;
 using Sandbox;
@@ -85,7 +86,7 @@ public static class Commands
 	[ConCmd.Engine( "polyhaven_download" )]
 	public async static void TestDownload( string id )
 	{
-		var asset = await PolyAsset.Create( id );
+		var asset = await HDRIAsset.Get( id );
 		await asset.DownloadHDR();
 	}
 
@@ -105,23 +106,23 @@ public static class Commands
 		}
 	}
 
-	[ConCmd.Engine("polyhaven_listunfinished")]
+	[ConCmd.Engine( "polyhaven_listunfinished" )]
 	public async static void ListUnfinished()
 	{
 		var unfinished = await AssetCompilePipeline.GetUnfinishedAssets();
-		foreach (var id in unfinished.Keys)
+		foreach ( var id in unfinished.Keys )
 		{
 			Log.Info( id );
 		}
 	}
 
-	[ConCmd.Engine("polyhaven_masscompile")]
+	[ConCmd.Engine( "polyhaven_masscompile" )]
 	public async static void DoCompile()
 	{
 		await AssetCompilePipeline.DoMassCompile();
 	}
 
-	[ConCmd.Engine("polyhaven_stop")]
+	[ConCmd.Engine( "polyhaven_stop" )]
 	public static void StopCompile()
 	{
 		AssetCompilePipeline.StopCompile();
@@ -138,5 +139,20 @@ public static class Commands
 		}
 		FileSystem.Root.WriteAllText( "assets.txt", files );
 		Log.Info( "Wrote to " + FileSystem.Root.GetFullPath( "assets.txt" ) );
+	}
+
+	[ConCmd.Engine( "polyhaven_list_mat_textures" )]
+	public async static void ListMatTextures( string id )
+	{
+		var asset = await TextureMaterialAsset.Get( id );
+		Log.Info( asset );
+		var tex = await PolyHavenAPI.Instance.GetMaterialTextures( id );
+		Log.Info( tex );
+	}
+
+	[ConCmd.Engine( "polyhaven_setup_material" )]
+	public async static void DownloadMaterial( string id )
+	{
+		await new MaterialCompilePipeline().SetupAsset( id );
 	}
 }

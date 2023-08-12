@@ -1,5 +1,6 @@
 ﻿using PolyHaven.API;
 using PolyHaven.AssetParty;
+using PolyHaven.Assets;
 using PolyHaven.Meta;
 using System;
 using System.Collections;
@@ -22,17 +23,17 @@ public static class AssetCompilePipeline
 				throw new ArgumentException( "The supplied asset must be an HDRI.", nameof( id ) );
 		}
 
-		var asset = new PolyAsset( id, entry );
+		var asset = new HDRIAsset( id, entry );
 		await asset.DownloadHDR();
 
 		var thumbTask = ThumbnailGenerator.GenerateThumbnail( asset );
-		asset.GenerateMaterial();
+		asset.GenerateHDRMaterial();
 		var thumb = await thumbTask;
-		if ( thumb != null && asset.Material != null )
-			ThumbnailGenerator.AssignThumbnail( asset.Material, thumb );
+		if ( thumb != null && asset.SBoxAsset != null )
+			ThumbnailGenerator.AssignThumbnail( asset.SBoxAsset, thumb );
 
 		asset.SetupMetadata();
-		if (publish)
+		if ( publish )
 		{
 			await AssetPublishing.Publish( asset );
 			MetaServer.Send( new AssetMeta( asset ) );
@@ -75,7 +76,7 @@ public static class AssetCompilePipeline
 		foreach ( var asset in assets )
 		{
 			if ( ShouldStop ) return;
-			if (asset.Key.Length > 32 || asset.Value.Name.Length > 32)
+			if ( asset.Key.Length > 32 || asset.Value.Name.Length > 32 )
 			{
 				Log.Warning( $"The title or ID for '{asset.Key}' is longer than 32 characters. Skipping." );
 				continue;

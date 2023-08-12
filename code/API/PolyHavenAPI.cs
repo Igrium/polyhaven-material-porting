@@ -73,6 +73,50 @@ public class PolyHavenAPI
 		return dict;
 	}
 
+	public async Task<MaterialTextureList> GetMaterialTextures(string id)
+	{
+		var url = $"files/{id}";
+		var response = await Client.GetAsync( url );
+		response.EnsureSuccessStatusCode();
+
+		var texList = await response.Content.ReadFromJsonAsync<MaterialTextureList>();
+		return texList;
+	}
+}
+
+public struct MaterialTextureList
+{
+	public struct TextureEntry
+	{
+		public struct TextureResolution
+		{
+			[JsonPropertyName("jpg")]
+			public FileReference JPEG { get; set; }
+			[JsonPropertyName("png")]
+			public FileReference PNG { get; set; }
+			[JsonPropertyName("exr")]
+			public FileReference EXR { get; set; }
+		}
+
+		[JsonPropertyName("8k")]
+		public TextureResolution? Res8k { get; set; }
+		[JsonPropertyName("4k")]
+		public TextureResolution? Res4k { get; set; }
+		[JsonPropertyName("2k")]
+		public TextureResolution? Res2k { get; set; }
+		[JsonPropertyName("1k")]
+		public TextureResolution? Res1k { get; set; }
+	}
+
+
+	public TextureEntry? Diffuse { get; set; }
+	[JsonPropertyName("nor_dx")]
+	public TextureEntry? NormalDX { get; set; }
+	[JsonPropertyName("nor_gl")]
+	public TextureEntry? NormalGL { get; set; }
+	public TextureEntry? Displacement { get; set; }
+	public TextureEntry? AO { get; set; }
+	public TextureEntry? Rough { get; set; }
 
 }
 
@@ -97,6 +141,4 @@ internal static class DeserializationBullshit
 		public string md5 { get; set; }
 		public string url { get; set; }
 	}
-
-
 }

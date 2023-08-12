@@ -3,24 +3,25 @@ using PolyHaven.API;
 using PolyHaven.Util;
 using Sandbox;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PolyHaven.Pipeline;
-public class PolyAsset
+namespace PolyHaven.Assets;
+public class HDRIAsset : IPolyAsset
 {
 	public string PolyHavenID { get; init; }
 	public AssetEntry Asset { get; init; }
 	public string? SourceTexturePath { get; protected set; }
-	public Asset? Material { get; protected set; }
-
+	public Asset? SBoxAsset { get; protected set; }
 	public string? AssetPartyURL { get; set; }
 
-	public PolyAsset( string polyHavenID, AssetEntry asset )
+	public HDRIAsset( string polyHavenID, AssetEntry asset )
 	{
 		PolyHavenID = polyHavenID;
 		Asset = asset;
@@ -50,14 +51,20 @@ public class PolyAsset
 			throw new InvalidOperationException( $"Download of {PolyHavenID} failed." );
 		}
 
-		fileDest = Path.GetRelativePath( activeProject.GetAssetsPath(), fileDest ).Replace('\\', '/');
+		fileDest = Path.GetRelativePath( activeProject.GetAssetsPath(), fileDest ).Replace( '\\', '/' );
 		SourceTexturePath = fileDest;
 		Log.Info( $"Saved file to {activeProject.Package.Ident}.{fileDest}" );
 
 		return fileDest;
 	}
 
-	public void GenerateMaterial()
+	public async Task<IEnumerable<string>> DownloadFiles()
+	{
+		var file = await DownloadHDR();
+		return new string[] { file };
+	}
+
+	public void GenerateHDRMaterial()
 	{
 		var activeProject = PolySettings.Instance.ActiveProject;
 		if ( activeProject == null )
@@ -77,24 +84,24 @@ public class PolyAsset
 
 		AssetSystem.RegisterFile( Path.Combine( activeProject.GetAssetsPath(), vmatPath ) );
 
-		Material = Editor.AssetSystem.FindByPath( vmatPath );
-		Log.Info( $"Wrote material to {Material}. Compiling..." );
+		SBoxAsset = AssetSystem.FindByPath( vmatPath );
+		Log.Info( $"Wrote material to {SBoxAsset}. Compiling..." );
 
-		Material.Compile(true);
+		SBoxAsset.Compile( true );
 		Log.Info( "Material compilation complete." );
 	}
 
 	public void SetupMetadata()
 	{
-		if ( Material == null )
+		if ( SBoxAsset == null )
 			throw new InvalidOperationException( "Material has not been generated." );
 
-		Material.MetaData.Set( "polyhaven_id", PolyHavenID );
-		Material.Publishing.CreateTemporaryProject();
+		SBoxAsset.MetaData.Set( "polyhaven_id", PolyHavenID );
+		SBoxAsset.Publishing.CreateTemporaryProject();
 
 		// Indents may not be longer than 32 characters.
 		string indent = PolyHavenID;
-		if (indent.Length > 32)
+		if ( indent.Length > 32 )
 		{
 			indent = new Random().NextStrings( 16, 1, allowedChars: RandomCharacters.INDENT_ALLOWED_CHARACTERS ).First();
 		}
@@ -104,14 +111,14 @@ public class PolyAsset
 		foreach ( var tag in Asset.Categories )
 			tags.Add( tag );
 
-		Material.Publishing.ProjectConfig.Ident = indent;
-		Material.Publishing.ProjectConfig.Title = Asset.Name;
-		Material.Publishing.ProjectConfig.Tags = string.Join( ' ', ReplaceSpaces( tags ) );
-		Material.Publishing.ProjectConfig.Org = "polyhaven";
-		Material.Publishing.Save();
+		SBoxAsset.Publishing.ProjectConfig.Ident = indent;
+		SBoxAsset.Publishing.ProjectConfig.Title = Asset.Name;
+		SBoxAsset.Publishing.ProjectConfig.Tags = string.Join( ' ', ReplaceSpaces( tags ) );
+		SBoxAsset.Publishing.ProjectConfig.Org = "polyhaven";
+		SBoxAsset.Publishing.Save();
 	}
 
-	private IEnumerable<string> ReplaceSpaces(IEnumerable<string> src)
+	private IEnumerable<string> ReplaceSpaces( IEnumerable<string> src )
 	{
 		foreach ( string s in src )
 		{
@@ -125,12 +132,12 @@ public class PolyAsset
 	/// <param name="polyHavenID">The ID</param>
 	/// <returns>The entry</returns>
 	/// <exception cref="ArgumentException">If the ID cannot be found.</exception>
-	public static async Task<PolyAsset> Create( string polyHavenID )
+	public static async Task<HDRIAsset> Get( string polyHavenID )
 	{
-		AssetEntry entry = await PolyHavenAPI.Instance.GetAsset( polyHavenID );
-		if ( entry.Type != API.AssetType.HDRI )
+		AssetEntry? entry = await PolyHavenAPI.Instance.GetAsset( polyHavenID );
+		if ( entry == null || entry.Type != API.AssetType.HDRI )
 			throw new ArgumentException( "The supplied asset must be an HDRI.", nameof( polyHavenID ) );
 
-		return new PolyAsset( polyHavenID, entry );
+		return new HDRIAsset( polyHavenID, entry );
 	}
 }

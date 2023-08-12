@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Editor;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,5 +33,12 @@ public struct FileReference
 	{
 		var bytes = await Download(client);
 		await File.WriteAllBytesAsync(filepath, bytes);
+	}
+
+	#nullable disable
+	public Task<bool> DownloadAsync(string filepath)
+	{
+		Directory.CreateDirectory(Path.GetDirectoryName(filepath));
+		return Utility.DownloadAsync(URL, filepath);
 	}
 }
