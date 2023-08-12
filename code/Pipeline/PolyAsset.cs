@@ -115,7 +115,7 @@ public class PolyAsset
 	{
 		foreach ( string s in src )
 		{
-			yield return s.Replace( ' ', '-' );
+			yield return s.Replace( " ", "" );
 		}
 	}
 

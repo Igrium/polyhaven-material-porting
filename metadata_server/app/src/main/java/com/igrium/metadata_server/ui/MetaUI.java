@@ -84,7 +84,8 @@ public class MetaUI {
     public void Load(AssetMeta asset) {
         title.setText(asset.assetEntry().name());
         description.setText(TextUtil.writeDescription(asset));
-        tags.setText(TextUtil.writeTags(asset.assetEntry().tagsList()));
+        String tagStr = asset.tags();
+        tags.setText(tagStr != null ? tagStr : TextUtil.writeTags(asset.assetEntry().tagsList()));
         this.asset = asset;
 
         ScreenshotManager.downloadScreenshot(asset.polyID()).thenAcceptAsync(file -> {

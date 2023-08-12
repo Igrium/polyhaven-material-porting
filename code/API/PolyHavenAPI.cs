@@ -1,4 +1,4 @@
-﻿#nullable disable
+﻿#nullable enable
 
 using System;
 using System.Collections;
@@ -38,7 +38,7 @@ public class PolyHavenAPI
 		return dict != null ? dict : new();
 	}
 
-	public async Task<AssetEntry> GetAsset(string assetID)
+	public async Task<AssetEntry?> GetAsset(string assetID)
 	{
 		var url = "info/" + assetID;
 		return await Client.GetFromJsonAsync<AssetEntry>( url );
@@ -76,6 +76,7 @@ public class PolyHavenAPI
 
 }
 
+#nullable disable
 internal static class DeserializationBullshit
 {
 	public class Resolution

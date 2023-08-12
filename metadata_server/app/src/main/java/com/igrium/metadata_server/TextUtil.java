@@ -11,7 +11,7 @@ public class TextUtil {
     private TextUtil() {};
 
     public static String writeTags(Collection<String> tags) {
-        var newTags = tags.stream().map(tag -> tag.replace(' ', '_'));
+        var newTags = tags.stream().map(tag -> tag.replace(' ', '-'));
         String str = "";
         Iterator<String> iter = newTags.iterator();
         

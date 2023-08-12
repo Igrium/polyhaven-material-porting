@@ -18,7 +18,7 @@ public static class AssetCompilePipeline
 		if ( entry == null )
 		{
 			entry = await PolyHavenAPI.Instance.GetAsset( id );
-			if ( entry.Type != API.AssetType.HDRI )
+			if ( entry == null || entry.Type != API.AssetType.HDRI )
 				throw new ArgumentException( "The supplied asset must be an HDRI.", nameof( id ) );
 		}
 
@@ -75,6 +75,11 @@ public static class AssetCompilePipeline
 		foreach ( var asset in assets )
 		{
 			if ( ShouldStop ) return;
+			if (asset.Key.Length > 32 || asset.Value.Name.Length > 32)
+			{
+				Log.Warning( $"The title or ID for '{asset.Key}' is longer than 32 characters. Skipping." );
+				continue;
+			}
 			try
 			{
 				Log.Info( $"Begining port for {asset.Key}" );
@@ -87,7 +92,7 @@ public static class AssetCompilePipeline
 				Log.Error( ex );
 			}
 		}
-
+		Log.Info( "Mass compile complete." );
 	}
 
 	public static void StopCompile()

@@ -18,10 +18,13 @@ public struct AssetMeta
 	[JsonPropertyName("asset_party_url")]
 	public string? AssetPartyURL { get; set; }
 
+	public string? Tags { get; set; }
+
 	public AssetMeta(PolyAsset asset)
 	{
 		AssetEntry = asset.Asset;
 		PolyID = asset.PolyHavenID;
 		AssetPartyURL = asset.AssetPartyURL;
+		Tags = asset.Material?.Publishing?.ProjectConfig.Tags;
 	}
 }

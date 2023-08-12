@@ -1,11 +1,11 @@
 {
-  "Title": "Poly Haven HDRI Porting",
+  "Title": "PolyHaven Asset Porting",
   "Type": "tool",
   "Org": "polyhaven",
   "Ident": "poly_haven_hdri_porting",
   "Tags": null,
   "Schema": 1,
-  "HasAssets": true,
+  "HasAssets": false,
   "AssetsPath": "",
   "Resources": null,
   "MenuResources": null,
