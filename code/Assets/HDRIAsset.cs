@@ -79,7 +79,7 @@ public class HDRIAsset : IPolyAsset
 		var template = new Template( "templates/skybox.template" );
 
 
-		var vmatContents = template.Parse( new Dictionary<string, string>() { { "SkyTexture", SourceTexturePath } } );
+		var vmatContents = template.Parse( new Dictionary<string, string?>() { { "SkyTexture", SourceTexturePath } } );
 		File.WriteAllText( Path.Combine( activeProject.GetAssetsPath(), vmatPath ), vmatContents );
 
 		AssetSystem.RegisterFile( Path.Combine( activeProject.GetAssetsPath(), vmatPath ) );

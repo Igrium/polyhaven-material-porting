@@ -1,8 +1,10 @@
 ﻿using Editor;
 using PolyHaven.API;
+using PolyHaven.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,11 +14,60 @@ namespace PolyHaven.Assets;
 
 public class TextureMaterialAsset : IPolyAsset
 {
+	/// <summary>
+	/// Assets in any of these categories will be sorted into folders of their name.
+	/// </summary>
+	protected static readonly string[] TopLevelCategories = new string[]
+	{
+		"arial",
+		"terrain",
+		"brick",
+		"wood",
+		"concrete",
+		"plaster",
+		"fabric",
+		"metal",
+		"rock",
+		"wall",
+		"floor",
+		"roofing"
+	};
+
+	protected struct CatEntry
+	{
+		public string Name;
+		public string FolderName;
+
+		public CatEntry( string name )
+		{
+			Name = name;
+			FolderName = name;
+		}
+
+		public CatEntry( string name, string folderName )
+		{
+			Name = name;
+			FolderName = folderName;
+		}
+
+		public static implicit operator CatEntry( string name ) => new CatEntry( name );
+	}
+
+	//protected static readonly Dictionary<string, string> TopLevelCategories = new()
+	//{
+	//	{ "arial", "arial" },
+	//	{ "terrain", "terrain" },
+	//	{ "floor", "floor" },
+
+	//};
+
 	public string PolyHavenID { get; init; }
 
 	public AssetEntry Asset { get; init; }
 
 	public DownloadedFileList? DownloadedFiles { get; private set; }
+
+	public string? SubfolderName { get; set; }
 
 	public Editor.Asset? SBoxAsset { get; private set; }
 
@@ -28,6 +79,17 @@ public class TextureMaterialAsset : IPolyAsset
 		}
 		PolyHavenID = polyHavenID;
 		Asset = asset;
+		SubfolderName = FindSubfolder( asset );
+	}
+
+	protected virtual string? FindSubfolder( AssetEntry asset )
+	{
+		foreach ( var cat in TopLevelCategories )
+		{
+			if ( asset.Categories.Contains( cat ) )
+				return cat;
+		}
+		return null;
 	}
 
 	/// <summary>
@@ -56,6 +118,8 @@ public class TextureMaterialAsset : IPolyAsset
 		return PolyHavenAPI.Instance.GetMaterialTextures( PolyHavenID );
 	}
 
+	public string LocalBasePath => SubfolderName != null ? "materials/" + SubfolderName : "materials";
+
 	/// <summary>
 	/// Download all the textures that this material needs.
 	/// </summary>
@@ -72,7 +136,7 @@ public class TextureMaterialAsset : IPolyAsset
 		{
 			throw new InvalidOperationException( "No active project." );
 		}
-		var localPrefix = $"materials/tex_{PolyHavenID}";
+		var localPrefix = $"{LocalBasePath}/tex_{PolyHavenID}";
 		var globalPrefix = Path.Combine( activeProject.GetAssetsPath(), localPrefix ).Replace( '\\', '/' );
 		MaterialTextureList textures = await GetTextures();
 
@@ -93,25 +157,21 @@ public class TextureMaterialAsset : IPolyAsset
 		if ( height.HasValue )
 			DownloadTasks.Add( CreateDownloadTask( height.Value, fileList.SetHeight, localPrefix, globalPrefix, "height.png" ) );
 
-		FileReference? ao = textures.AO?.Res2k?.JPEG;
+		FileReference? ao = textures.AO?.Res1k?.JPEG;
 		if ( ao.HasValue )
 			DownloadTasks.Add( CreateDownloadTask( ao.Value, fileList.SetAO, localPrefix, globalPrefix, "ao.jpg" ) );
 
-		FileReference? rough = textures.Rough?.Res2k?.JPEG;
+		FileReference? rough = textures.Rough?.Res2k?.PNG;
 		if ( rough.HasValue )
-			DownloadTasks.Add( CreateDownloadTask( rough.Value, fileList.SetRough, localPrefix, globalPrefix, "rough.jpg" ) );
+			DownloadTasks.Add( CreateDownloadTask( rough.Value, fileList.SetRough, localPrefix, globalPrefix, "rough.png" ) );
+
+		FileReference? metal = textures.Metal?.Res2k?.JPEG;
+		if ( metal.HasValue )
+			DownloadTasks.Add( CreateDownloadTask( metal.Value, fileList.SetMetal, localPrefix, globalPrefix, "metal.jpg" ) );
 
 		await Task.WhenAll( DownloadTasks );
 		DownloadedFiles = fileList;
 		return fileList;
-	}
-
-	public void GenerateSBoxAsset( bool useDisplacement = false )
-	{
-		if (DownloadedFiles == null)
-		{
-			throw new InvalidOperationException( "Textures have not been downloaded." );
-		}
 	}
 
 	private delegate void FileConsumer( string filename );
@@ -131,6 +191,81 @@ public class TextureMaterialAsset : IPolyAsset
 			throw new InvalidOperationException( "Unable to download from " + file.URL );
 		}
 	}
+	public void GenerateSBoxAsset( bool useDisplacement = false )
+	{
+		if ( DownloadedFiles == null )
+			throw new InvalidOperationException( "Textures have not been downloaded." );
+
+		if ( SBoxAsset != null )
+			Log.Warning( "The asset has already been generated. Overridding..." );
+
+		var activeProject = PolySettings.Instance.ActiveProject;
+		if ( activeProject == null )
+			throw new InvalidOperationException( "no active project." );
+
+		var vmatPath = $"{LocalBasePath}/{PolyHavenID}.vmat";
+		Log.Info( "Generating material " + vmatPath );
+
+		Template template;
+		if ( DownloadedFiles.Metal != null )
+			template = new Template( "templates/simple_metal.template" );
+		else
+			template = new Template( "templates/simple_standard.template" );
+
+		var vmatContents = template.Parse( new Dictionary<string, string?>
+		{
+			{ "ColorTexture", DownloadedFiles.Color },
+			{ "RoughnessTexture", DownloadedFiles.Rough },
+			{ "NormalTexture", DownloadedFiles.Normal },
+			{ "AOTexture", DownloadedFiles.AO },
+			{ "MetalnessTexture", DownloadedFiles.Metal }
+		} );
+		Log.Info(DownloadedFiles.Metal );
+
+		File.WriteAllText( Path.Combine( activeProject.GetAssetsPath(), vmatPath ), vmatContents );
+		AssetSystem.RegisterFile( Path.Combine( activeProject.GetAssetsPath(), vmatPath ) );
+
+		SBoxAsset = AssetSystem.FindByPath( vmatPath );
+		Log.Info( $"Wrote material to {SBoxAsset}" );
+
+		SBoxAsset.Compile( true );
+	}
+
+
+	public void SetupMetadata()
+	{
+		if ( SBoxAsset == null )
+			throw new InvalidOperationException( "Material has not been generated." );
+
+		SBoxAsset.MetaData.Set( "polyhaven_id", PolyHavenID );
+		SBoxAsset.Publishing.CreateTemporaryProject();
+
+		// Indents may not be longer than 32 characters.
+		string indent = PolyHavenID;
+		if ( indent.Length > 32 )
+		{
+			indent = new Random().NextStrings( 16, 1, allowedChars: RandomCharacters.INDENT_ALLOWED_CHARACTERS ).First();
+		}
+		var tags = new HashSet<string>();
+		foreach ( var tag in Asset.Tags )
+			tags.Add( tag );
+		foreach ( var tag in Asset.Categories )
+			tags.Add( tag );
+
+		SBoxAsset.Publishing.ProjectConfig.Ident = indent;
+		SBoxAsset.Publishing.ProjectConfig.Title = Asset.Name;
+		SBoxAsset.Publishing.ProjectConfig.Tags = string.Join( ' ', ReplaceSpaces( tags ) );
+		SBoxAsset.Publishing.ProjectConfig.Org = "polyhaven";
+		SBoxAsset.Publishing.Save();
+	}
+
+	private IEnumerable<string> ReplaceSpaces( IEnumerable<string> src )
+	{
+		foreach ( string s in src )
+		{
+			yield return s.Replace( " ", "" );
+		}
+	}
 
 	public override string ToString()
 	{
@@ -139,26 +274,28 @@ public class TextureMaterialAsset : IPolyAsset
 
 	public class DownloadedFileList : IEnumerable<string>
 	{
-		public string? Diffuse;
+		public string? Color;
 		public string? Normal;
 		public string? Height;
 		public string? AO;
 		public string? Rough;
+		public string? Metal;
 
-		public void SetDiffuse( string val ) { Diffuse = val; }
+		public void SetDiffuse( string val ) { Color = val; }
 		public void SetNormal( string val ) { Normal = val; }
 		public void SetHeight( string val ) { Height = val; }
 		public void SetAO( string val ) { AO = val; }
 		public void SetRough( string val ) { Rough = val; }
-
+		public void SetMetal( string val ) { Metal = val; }
 
 		public IEnumerator<string> GetEnumerator()
 		{
-			if ( Diffuse != null ) yield return Diffuse;
+			if ( Color != null ) yield return Color;
 			if ( Normal != null ) yield return Normal;
 			if ( Height != null ) yield return Height;
 			if ( AO != null ) yield return AO;
 			if ( Rough != null ) yield return Rough;
+			if ( Metal != null ) yield return Metal;
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

@@ -14,6 +14,7 @@ public class MaterialCompilePipeline
 
 	public async Task SetupAsset( string id, AssetEntry? entry = null )
 	{
+		Log.Info( "Retrieving asset metadata" );
 		if ( entry == null )
 		{
 			entry = await API.GetAsset( id );
@@ -23,7 +24,11 @@ public class MaterialCompilePipeline
 			throw new ArgumentException( "The supplied asset must be a material.", nameof( id ) );
 		}
 
+		Log.Info( "Downloading textures..." );
 		TextureMaterialAsset asset = new TextureMaterialAsset( id, entry );
 		await asset.DownloadFiles();
+
+		asset.GenerateSBoxAsset();
+		asset.SetupMetadata();
 	}
 }

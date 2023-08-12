@@ -154,5 +154,6 @@ public static class Commands
 	public async static void DownloadMaterial( string id )
 	{
 		await new MaterialCompilePipeline().SetupAsset( id );
+		Log.Info( "Finished setting up material" );
 	}
 }

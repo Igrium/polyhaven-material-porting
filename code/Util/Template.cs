@@ -23,7 +23,7 @@ public class Template
 	}
 
 
-	public string Parse( Dictionary<string, string> values )
+	public string Parse( Dictionary<string, string?> values )
 	{
 		//
 		// example template:
@@ -36,7 +36,7 @@ public class Template
 		var str = TemplateContents;
 		foreach ( var pair in values )
 		{
-			str = str.Replace( $"<#= {pair.Key} #>", pair.Value );
+			str = str.Replace( $"<#= {pair.Key} #>", pair.Value != null ? pair.Value : "" );
 		}
 
 		return str;

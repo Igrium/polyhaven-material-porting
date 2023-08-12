@@ -16,4 +16,6 @@ public interface IPolyAsset
 	public Editor.Asset? SBoxAsset { get; }
 
 	public Task<IEnumerable<string>> DownloadFiles();
+
+	public void SetupMetadata();
 }

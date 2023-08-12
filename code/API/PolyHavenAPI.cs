@@ -117,6 +117,7 @@ public struct MaterialTextureList
 	public TextureEntry? Displacement { get; set; }
 	public TextureEntry? AO { get; set; }
 	public TextureEntry? Rough { get; set; }
+	public TextureEntry? Metal { get; set; }
 
 }
 
