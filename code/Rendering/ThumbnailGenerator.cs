@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PolyHaven.Pipeline;
+namespace PolyHaven.Rendering;
 
 public class ThumbnailGenerator
 {
@@ -42,10 +42,10 @@ public class ThumbnailGenerator
 		return outputPath;
 	}
 
-	public static void AssignThumbnail(Asset asset, string thumbPath)
+	public static void AssignThumbnail( Asset asset, string thumbPath )
 	{
 		var fullPath = FileSystem.Content.GetFullPath( thumbPath );
-		if (fullPath == null)
+		if ( fullPath == null )
 		{
 			Log.Warning( "Unable to find thumbnail: " + thumbPath );
 		}
@@ -63,7 +63,7 @@ public class ThumbnailGenerator
 		var scriptFile = FileSystem.Content.GetFullPath( "python/render_thumbnail.py" );
 		if ( scriptFile == null )
 		{
-			throw new InvalidOperationException( "Unable to locate rendery_thumbnail.py" );
+			throw new InvalidOperationException( "Unable to locate render_thumbnail.py" );
 		}
 
 		var process = new Process();

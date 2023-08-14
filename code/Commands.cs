@@ -12,6 +12,7 @@ using PolyHaven.AssetParty;
 using PolyHaven.Assets;
 using PolyHaven.Meta;
 using PolyHaven.Pipeline;
+using PolyHaven.Rendering;
 using Sandbox;
 using Sandbox.Diagnostics;
 
@@ -155,5 +156,15 @@ public static class Commands
 	{
 		await new MaterialCompilePipeline().SetupAsset( id );
 		Log.Info( "Finished setting up material" );
+	}
+
+	[ConCmd.Engine( "polyhaven_create_preview" )]
+	public static void RenderMaterialPreview(string path)
+	{
+		Asset asset = AssetSystem.FindByPath( path );
+		Log.Info( "Generating preview for " + asset.Path );
+
+		var output = MaterialRenderer.RenderMaterialPreview( asset );
+		Log.Info( "Saved image to " + output );
 	}
 }

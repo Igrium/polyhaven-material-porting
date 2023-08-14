@@ -2,6 +2,7 @@
 using PolyHaven.AssetParty;
 using PolyHaven.Assets;
 using PolyHaven.Meta;
+using PolyHaven.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
