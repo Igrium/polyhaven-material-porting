@@ -11,7 +11,7 @@ namespace PolyHaven.Rendering;
 
 public static class MaterialRenderer
 {
-	public static string RenderMaterialPreview( Asset material )
+	public static string RenderMaterialPreview( Asset material, float scale = 1 )
 	{
 		if ( material.AssetType != AssetType.Material )
 		{
@@ -21,6 +21,7 @@ public static class MaterialRenderer
 		var preview = new MaterialPreview( material );
 
 		preview.InitializeScene();
+		preview.ScaleFactor = scale;
 		preview.InitializeAsset();
 
 		string? dirname = Path.GetDirectoryName( material.AbsolutePath ) + "/preview";

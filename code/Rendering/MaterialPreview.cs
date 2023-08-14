@@ -17,6 +17,8 @@ public class MaterialPreview
 
 	public Vector2 Resolution = new Vector2( 1920, 1080 );
 
+	public Vector2 ScaleFactor { get; set; } = 1;
+
 	public Transform CameraTransform { get; set; } = new Transform(
 		new Vector3( 51.5225143433f, -38.3574523926f, 20.7468070984f ),
 		new Rotation( -0.311045289f, 0.1483659297f, 0.8472904563f, 0.4041499197f ) );
@@ -52,7 +54,6 @@ public class MaterialPreview
 
 		new SceneLight( World, Camera.Position + Vector3.Up * 500.0f + right * 100.0f, 1000.0f, new Color( 1.0f, 0.9f, 0.9f ) * 50.0f );
 		var cubemap = new SceneCubemap( World, Texture.Load( "textures/cubemaps/sky_riverbank.vtex" ), BBox.FromPositionAndSize( Vector3.Zero, 1000 ) );
-		//cubemap.LightColor = new Color( .5f );
 	}
 
 	public virtual void InitializeAsset()
@@ -64,7 +65,8 @@ public class MaterialPreview
 			modelObj = new SceneModel( World, model, Transform.Zero );
 			modelObj.Update( 1 );
 
-			var material = Material.Load( Asset.Path );
+			var material = Material.Load( Asset.Path ).CreateCopy();
+			material.Set( "g_vTexCoordScale", ScaleFactor );
 			modelObj.SetMaterialOverride( material );
 		}
 	}

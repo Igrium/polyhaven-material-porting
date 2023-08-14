@@ -16,10 +16,10 @@
 						material_name = "materials/floor/slate_floor.vmat"
 						origin = [ 0.0, 0.0, 0.0 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						max_u = 4.0
-						max_v = 4.0
+						max_u = 5.0
+						max_v = 5.0
 						width = 128.0
-						height = 129.0
+						height = 128.0
 						segments_x = 1
 						segments_y = 1
 					},

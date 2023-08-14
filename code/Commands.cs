@@ -159,12 +159,12 @@ public static class Commands
 	}
 
 	[ConCmd.Engine( "polyhaven_create_preview" )]
-	public static void RenderMaterialPreview(string path)
+	public static void RenderMaterialPreview(string path, float scale = 1)
 	{
 		Asset asset = AssetSystem.FindByPath( path );
 		Log.Info( "Generating preview for " + asset.Path );
 
-		var output = MaterialRenderer.RenderMaterialPreview( asset );
+		var output = MaterialRenderer.RenderMaterialPreview( asset, scale );
 		Log.Info( "Saved image to " + output );
 	}
 }
