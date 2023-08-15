@@ -47,13 +47,14 @@ public class MaterialPreview
 
 		var right = Camera.Rotation.Right;
 
-		var sun = new SceneSunLight( World, Rotation.From(38.43f, 323.78f, -.44f), (Color.White * 2.5f + Color.Cyan * 0.05f) * .1f );
+		var sun = new SceneSunLight( World, Rotation.From(38.43f, 323.78f, -.44f), (Color.White * 2.5f) * .05f );
 		sun.ShadowsEnabled = true;
 		//sun.SkyColor = Color.White * 0.5f + Color.Cyan * 0.025f;
 		sun.ShadowTextureResolution = 1024;
+		sun.SkyColor = Color.Black;
 
-		new SceneLight( World, Camera.Position + Vector3.Up * 500.0f + right * 100.0f, 1000.0f, new Color( 1.0f, 0.9f, 0.9f ) * 50.0f );
-		var cubemap = new SceneCubemap( World, Texture.Load( "textures/cubemaps/sky_riverbank.vtex" ), BBox.FromPositionAndSize( Vector3.Zero, 1000 ) );
+		new SceneLight( World, Camera.Position + Vector3.Up * 500.0f + right * 100.0f, 1000.0f, new Color( .85f, 0.9f, 1f ) * 50.0f );
+		var cubemap = new SceneCubemap( World, Texture.Load( "textures/cubemaps/sky_gamrig.vtex" ), BBox.FromPositionAndSize( Vector3.Zero, 1024 ) );
 	}
 
 	public virtual void InitializeAsset()
