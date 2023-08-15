@@ -30,7 +30,8 @@ public class TextureMaterialAsset : IPolyAsset
 		"rock",
 		"wall",
 		"floor",
-		"roofing"
+		"roofing",
+		"outdoor"
 	};
 
 	protected struct CatEntry
@@ -220,7 +221,6 @@ public class TextureMaterialAsset : IPolyAsset
 			{ "AOTexture", DownloadedFiles.AO },
 			{ "MetalnessTexture", DownloadedFiles.Metal }
 		} );
-		Log.Info(DownloadedFiles.Metal );
 
 		File.WriteAllText( Path.Combine( activeProject.GetAssetsPath(), vmatPath ), vmatContents );
 		AssetSystem.RegisterFile( Path.Combine( activeProject.GetAssetsPath(), vmatPath ) );

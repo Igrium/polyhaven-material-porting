@@ -152,20 +152,11 @@ public static class Commands
 		Log.Info( tex );
 	}
 
-	[ConCmd.Engine( "polyhaven_setup_material" )]
+	[ConCmd.Engine( "download_material" )]
 	public async static void DownloadMaterial( string id )
 	{
 		await new MaterialCompilePipeline().SetupAsset( id );
 		Log.Info( "Finished setting up material" );
 	}
 
-	[ConCmd.Engine( "polyhaven_create_preview" )]
-	public static void RenderMaterialPreview(string path, float scale = 1)
-	{
-		Asset asset = AssetSystem.FindByPath( path );
-		Log.Info( "Generating preview for " + asset.Path );
-
-		var output = MaterialRenderer.RenderMaterialPreview( asset, MaterialRenderType.Plane, scale );
-		Log.Info( "Saved image to " + output );
-	}
 }
