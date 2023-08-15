@@ -1,4 +1,5 @@
-﻿using PolyHaven.API;
+﻿using Editor;
+using PolyHaven.API;
 using PolyHaven.Assets;
 using System;
 using System.Collections.Generic;
@@ -20,11 +21,24 @@ public struct AssetMeta
 
 	public string? Tags { get; set; }
 
-	public AssetMeta(HDRIAsset asset)
+	public AssetMeta(IPolyAsset asset)
 	{
 		AssetEntry = asset.Asset;
 		PolyID = asset.PolyHavenID;
-		AssetPartyURL = asset.AssetPartyURL;
+		AssetPartyURL = asset.SBoxAsset?.Package.Url;
 		Tags = asset.SBoxAsset?.Publishing?.ProjectConfig.Tags;
+	}
+
+	public AssetMeta(Asset asset)
+	{
+		AssetEntry = asset.MetaData.Get<AssetEntry>( "PolyAsset" );
+		PolyID = asset.MetaData.GetString( "polyhaven_id" );
+		if (AssetEntry == null || PolyID == null)
+		{
+			throw new ArgumentException( "Asset does not have PolyHaven metadata.", nameof( asset ) );
+		}
+
+		AssetPartyURL = asset.Package?.Url;
+		Tags = asset.Publishing?.ProjectConfig.Tags;
 	}
 }

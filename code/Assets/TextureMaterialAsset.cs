@@ -257,6 +257,8 @@ public class TextureMaterialAsset : IPolyAsset
 		SBoxAsset.Publishing.ProjectConfig.Tags = string.Join( ' ', ReplaceSpaces( tags ) );
 		SBoxAsset.Publishing.ProjectConfig.Org = "polyhaven";
 		SBoxAsset.Publishing.Save();
+
+		SBoxAsset.MetaData.Set( "PolyAsset", Asset );
 	}
 
 	private IEnumerable<string> ReplaceSpaces( IEnumerable<string> src )

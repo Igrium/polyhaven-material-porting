@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Sandbox;
 using System.Net.Http;
 using System.Text.Json;
+using Editor;
 
 namespace PolyHaven.Meta;
 
