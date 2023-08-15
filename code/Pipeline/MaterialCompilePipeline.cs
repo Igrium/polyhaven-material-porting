@@ -1,5 +1,6 @@
 ﻿using PolyHaven.API;
 using PolyHaven.Assets;
+using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,5 +31,21 @@ public class MaterialCompilePipeline
 
 		asset.GenerateSBoxAsset();
 		asset.SetupMetadata();
+	}
+
+
+	[ConCmd.Engine( "download_material" )]
+	public async static void DownloadMaterial( string id )
+	{
+		await new MaterialCompilePipeline().SetupAsset( id );
+		Log.Info( "Finished setting up material" );
+	}
+
+	private static IEnumerable<string> ReplaceSpaces( IEnumerable<string> src )
+	{
+		foreach ( string s in src )
+		{
+			yield return s.Replace( " ", "" );
+		}
 	}
 }

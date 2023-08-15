@@ -151,12 +151,4 @@ public static class Commands
 		var tex = await PolyHavenAPI.Instance.GetMaterialTextures( id );
 		Log.Info( tex );
 	}
-
-	[ConCmd.Engine( "download_material" )]
-	public async static void DownloadMaterial( string id )
-	{
-		await new MaterialCompilePipeline().SetupAsset( id );
-		Log.Info( "Finished setting up material" );
-	}
-
 }
