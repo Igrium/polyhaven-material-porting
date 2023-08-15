@@ -11,14 +11,16 @@ namespace PolyHaven.Rendering;
 
 public static class MaterialRenderer
 {
-	public static string RenderMaterialPreview( Asset material, float scale = 1 )
+	public enum MaterialRenderType { Plane, Sphere }
+
+	public static string RenderMaterialPreview( Asset material, MaterialRenderType type, float scale = 1 )
 	{
 		if ( material.AssetType != AssetType.Material )
 		{
 			throw new ArgumentException( "Asset must be a material.", nameof( material ) );
 		}
 
-		var preview = new MaterialPreview( material );
+		MaterialPreview preview = type == MaterialRenderType.Plane ? new PlaneMaterialPreview( material ) : new SphereMaterialPreview( material );
 
 		preview.InitializeScene();
 		preview.ScaleFactor = scale;
@@ -33,7 +35,7 @@ public static class MaterialRenderer
 		Directory.CreateDirectory( dirname );
 		Log.Info( "Created directory " + dirname );
 		string path = Path.Combine( dirname, $"{material.Name}.jpg" );
-		preview.RenderPreview( path );
+		preview.Render( path );
 
 		return path;
 	}

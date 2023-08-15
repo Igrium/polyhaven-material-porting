@@ -15,6 +15,7 @@ using PolyHaven.Pipeline;
 using PolyHaven.Rendering;
 using Sandbox;
 using Sandbox.Diagnostics;
+using static PolyHaven.Rendering.MaterialRenderer;
 
 namespace PolyHaven;
 
@@ -164,7 +165,7 @@ public static class Commands
 		Asset asset = AssetSystem.FindByPath( path );
 		Log.Info( "Generating preview for " + asset.Path );
 
-		var output = MaterialRenderer.RenderMaterialPreview( asset, scale );
+		var output = MaterialRenderer.RenderMaterialPreview( asset, MaterialRenderType.Plane, scale );
 		Log.Info( "Saved image to " + output );
 	}
 }

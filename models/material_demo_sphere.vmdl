@@ -10,18 +10,17 @@
 				children = 
 				[
 					{
-						_class = "RenderPrimitivePlane"
-						name = "render_plane"
+						_class = "RenderPrimitiveSphere"
+						name = "sphere"
 						parent_bone = ""
-						material_name = "dev/helper/testgrid.vmat"
+						material_name = "materials/metal/metal_plate.vmat"
 						origin = [ 0.0, 0.0, 0.0 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						max_u = 5.0
-						max_v = 5.0
-						width = 128.0
-						height = 128.0
-						segments_x = 1
-						segments_y = 1
+						max_u = 2.0
+						max_v = 4.0
+						radius = 8.0
+						segments_u = 64
+						segments_v = 64
 					},
 				]
 			},
