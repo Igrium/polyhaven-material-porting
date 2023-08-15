@@ -39,7 +39,7 @@ public class PlaneMaterialPreview : MaterialPreview
 		sun.ShadowsEnabled = true;
 		//sun.SkyColor = Color.White * 0.5f + Color.Cyan * 0.025f;
 		sun.ShadowTextureResolution = 1024;
-		sun.SkyColor = Color.Black;
+		sun.SkyColor = Color.White * .1f;
 
 		new SceneLight( World, camera.Position + Vector3.Up * 500.0f + right * 100.0f, 1000.0f, new Color( .85f, 0.9f, 1f ) * 50.0f );
 		var cubemap = new SceneCubemap( World, Texture.Load( "textures/cubemaps/sky_gamrig.vtex" ), BBox.FromPositionAndSize( Vector3.Zero, 1024 ) );

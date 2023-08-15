@@ -37,7 +37,7 @@ public static class MaterialRenderer
 		string path = Path.Combine( dirname, filename );
 
 		preview.Render( path );
-		AssetSystem.RegisterFile( filename );
+		AssetSystem.RegisterFile( path );
 		Log.Info( $"Wrote image to {AssetSystem.FindByPath( path )}" );
 		return path;
 	}
