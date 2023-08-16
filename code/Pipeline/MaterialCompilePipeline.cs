@@ -30,10 +30,14 @@ public class MaterialCompilePipeline
 		TextureMaterialAsset asset = new TextureMaterialAsset( id, entry );
 		await asset.DownloadFiles(resolution, aoResolution);
 
-		if (!texOnly)
+		if ( !texOnly )
 		{
 			asset.GenerateSBoxAsset();
 			asset.SetupMetadata();
+		}
+		else
+		{
+			Log.Info( "Supressing material generation." );
 		}
 	}
 
@@ -57,7 +61,7 @@ public class MaterialCompilePipeline
 			aoRes = args[index + 1];
 		}
 
-		bool texOnly = args.Contains( "texOnly" );
+		bool texOnly = args.Contains( "--texOnly" );
 
 		await new MaterialCompilePipeline().SetupAsset( id, res, aoRes, texOnly: texOnly );
 		Log.Info( "Finished setting up material" );
