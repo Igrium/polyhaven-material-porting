@@ -121,12 +121,17 @@ public class TextureMaterialAsset : IPolyAsset
 
 	public string LocalBasePath => SubfolderName != null ? "materials/" + SubfolderName : "materials";
 
+	public Task<IEnumerable<string>> DownloadFiles()
+	{
+		return DownloadFiles( "2k", "1k" );
+	}
+
 	/// <summary>
 	/// Download all the textures that this material needs.
 	/// </summary>
 	/// <returns>A task that finishes when the textures have downloaded.</returns>
 	/// <exception cref="InvalidOperationException">If there is no active project.</exception>
-	public async Task<IEnumerable<string>> DownloadFiles()
+	public async Task<IEnumerable<string>> DownloadFiles(string resolution = "2k", string aoRes = "1k")
 	{
 		if ( DownloadedFiles != null )
 		{
@@ -146,27 +151,28 @@ public class TextureMaterialAsset : IPolyAsset
 		List<Task<string>> DownloadTasks = new( 5 );
 		DownloadedFileList fileList = new();
 
-		FileReference? diff = textures.Diffuse?.Res2k?.JPEG;
+		FileReference? diff = textures.Diffuse?.GetResolution(resolution)?.JPEG;
 		if ( diff.HasValue )
 			DownloadTasks.Add( CreateDownloadTask( diff.Value, fileList.SetDiffuse, localPrefix, globalPrefix, "color.jpg" ) );
 
-		FileReference? normal = textures.NormalGL?.Res2k?.PNG;
+		FileReference? normal = textures.NormalGL?.GetResolution(resolution)?.PNG;
 		if ( normal.HasValue )
 			DownloadTasks.Add( CreateDownloadTask( normal.Value, fileList.SetNormal, localPrefix, globalPrefix, "normal.png" ) );
 
-		FileReference? height = textures.Displacement?.Res2k?.PNG;
+		// Don't need any higher resolution
+		FileReference? height = textures.Displacement?.Res1k?.PNG;
 		if ( height.HasValue )
 			DownloadTasks.Add( CreateDownloadTask( height.Value, fileList.SetHeight, localPrefix, globalPrefix, "height.png" ) );
 
-		FileReference? ao = textures.AO?.Res1k?.JPEG;
+		FileReference? ao = textures.AO?.GetResolution(aoRes)?.JPEG;
 		if ( ao.HasValue )
 			DownloadTasks.Add( CreateDownloadTask( ao.Value, fileList.SetAO, localPrefix, globalPrefix, "ao.jpg" ) );
 
-		FileReference? rough = textures.Rough?.Res2k?.PNG;
+		FileReference? rough = textures.Rough?.GetResolution(resolution)?.PNG;
 		if ( rough.HasValue )
 			DownloadTasks.Add( CreateDownloadTask( rough.Value, fileList.SetRough, localPrefix, globalPrefix, "rough.png" ) );
 
-		FileReference? metal = textures.Metal?.Res2k?.JPEG;
+		FileReference? metal = textures.Metal?.GetResolution(resolution)?.JPEG;
 		if ( metal.HasValue )
 			DownloadTasks.Add( CreateDownloadTask( metal.Value, fileList.SetMetal, localPrefix, globalPrefix, "metal.jpg" ) );
 

@@ -45,7 +45,7 @@ public static class TextUtils
 
 	public static string WriteDescription(AssetMeta asset)
 	{
-		return $"By {WriteAuthors( asset.AssetEntry.Authors.Keys )} on PolyHaven \n \n {WriteURL( asset.PolyID )}";
+		return $"By {WriteAuthors( asset.AssetEntry.Authors.Keys )} on PolyHaven\n\n{WriteURL( asset.PolyID )}";
 	}
 
 	public static string WriteURL(string polyID)

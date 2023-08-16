@@ -106,6 +106,15 @@ public struct MaterialTextureList
 		public TextureResolution? Res2k { get; set; }
 		[JsonPropertyName("1k")]
 		public TextureResolution? Res1k { get; set; }
+
+		public TextureResolution? GetResolution(string res)
+		{
+			if ( res == "8k" ) return Res8k;
+			if ( res == "4k" ) return Res4k;
+			if ( res == "2k" ) return Res2k;
+			if ( res == "1k" ) return Res1k;
+			return null;
+		}
 	}
 
 
@@ -118,7 +127,6 @@ public struct MaterialTextureList
 	public TextureEntry? AO { get; set; }
 	public TextureEntry? Rough { get; set; }
 	public TextureEntry? Metal { get; set; }
-
 }
 
 #nullable disable
