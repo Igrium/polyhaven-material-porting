@@ -1,26 +1,15 @@
-﻿#nullable enable
-
+using PolyHaven.Assets;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using static PolyHaven.API.DeserializationBullshit;
-
 namespace PolyHaven.API;
 
-public class PolyHavenAPI
+public static class PolyHavenApi
 {
-	public static readonly PolyHavenAPI Instance = new PolyHavenAPI();
-
-	public HttpClient Client { get; set; } = new HttpClient()
+	public static HttpClient Client { get; } = new HttpClient()
 	{
 		BaseAddress = new Uri( "https://api.polyhaven.com" )
 	};
@@ -30,18 +19,18 @@ public class PolyHavenAPI
 	/// </summary>
 	/// <param name="category">Category to look in</param>
 	/// <returns>Dictionary with all the assets.</returns>
-	public async Task<Dictionary<string, AssetEntry>> GetAssets(string? category = null)
+	public static async Task<Dictionary<string, PolyHavenAssetInfo>> GetAssets(string? category = null)
 	{
 		var url = category == null ? "assets" : "assets?t=" + category;
-		var dict = await Client.GetFromJsonAsync<Dictionary<string, AssetEntry>>( url );
+		var dict = await Client.GetFromJsonAsync<Dictionary<string, PolyHavenAssetInfo>>( url );
 
-		return dict != null ? dict : new();
+		return dict ?? new();
 	}
 
-	public async Task<AssetEntry?> GetAsset(string assetID)
+	public static async Task<PolyHavenAssetInfo?> GetAsset(string assetId)
 	{
-		var url = "info/" + assetID;
-		return await Client.GetFromJsonAsync<AssetEntry>( url );
+		var url = "info/" + assetId;
+		return await Client.GetFromJsonAsync<PolyHavenAssetInfo>( url );
 	}
 
 	/// <summary>
@@ -50,30 +39,23 @@ public class PolyHavenAPI
 	/// <param name="id">HDR id</param>
 	/// <returns>A dictionary with the resolution name and the file entry.</returns>
 	/// <exception cref="InvalidOperationException">If the server returns unexpected responses.</exception>
-	public async Task<Dictionary<string, FileReference>> GetHDRFiles(string id)
+	public static async Task<Dictionary<string, FileInfo>> GetHdrFiles(string id)
 	{
 		var url = $"files/{id}";
 		var response = await Client.GetAsync( url );
 		response.EnsureSuccessStatusCode();
 
 		// geezus
-		var json = await response.Content.ReadFromJsonAsync<FileResRoot>();
+		var json = await response.Content.ReadFromJsonAsync<DeserializationBullshit.FileResRoot>();
 		if (json == null)
 		{
 			throw new InvalidOperationException( "Poly haven returned no response." );
 		}
 
-		Dictionary<string, FileReference> dict = new();
-
-		foreach (var res in json.hdri)
-		{
-			dict.Add( res.Key, res.Value.exr );
-		}
-
-		return dict;
+		return json.hdri.ToDictionary( res => res.Key, res => res.Value.exr );
 	}
 
-	public async Task<MaterialTextureList> GetMaterialTextures(string id)
+	public static async Task<MaterialTextureList> GetMaterialTextures(string id)
 	{
 		var url = $"files/{id}";
 		var response = await Client.GetAsync( url );
@@ -82,7 +64,27 @@ public class PolyHavenAPI
 		var texList = await response.Content.ReadFromJsonAsync<MaterialTextureList>();
 		return texList;
 	}
+
+	public static async Task<HdriAsset> GetHdriAsset( string id )
+	{
+		var info = await GetAsset(id);
+		if (info == null || info.Type != PhAssetType.HDRI)
+			throw new ArgumentException( "The supplied asset must be an HDRI.", nameof( id ) );
+
+		return new HdriAsset( id, info );
+	}
 }
+
+public record struct FileInfo
+{
+	[JsonPropertyName("url")]
+	public required string Url { get; init; }
+	[JsonPropertyName("md5")]
+	public required string MD5 { get; init; }
+	[JsonPropertyName("size")]
+	public required ulong Size { get; init; }
+}
+
 
 public struct MaterialTextureList
 {
@@ -91,11 +93,11 @@ public struct MaterialTextureList
 		public struct TextureResolution
 		{
 			[JsonPropertyName("jpg")]
-			public FileReference JPEG { get; set; }
+			public FileInfo JPEG { get; set; }
 			[JsonPropertyName("png")]
-			public FileReference PNG { get; set; }
+			public FileInfo PNG { get; set; }
 			[JsonPropertyName("exr")]
-			public FileReference EXR { get; set; }
+			public FileInfo EXR { get; set; }
 		}
 
 		[JsonPropertyName("8k")]
@@ -134,8 +136,8 @@ internal static class DeserializationBullshit
 {
 	public class Resolution
 	{
-		public FileReference hdr { get; set; }
-		public FileReference exr { get; set; }
+		public FileInfo hdr { get; set; }
+		public FileInfo exr { get; set; }
 	}
 
 	public class FileResRoot

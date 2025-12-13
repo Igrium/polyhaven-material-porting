@@ -1,25 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
 namespace PolyHaven.API;
 
-public enum AssetType
+public enum PhAssetType
 {
 	HDRI = 0,
 	Texture = 1,
 	Model = 2
 }
 
-public class AssetEntry
+public class PolyHavenAssetInfo
 {
 	public string Name { get; set; } = "";
-	public AssetType Type { get; set; }
+	public PhAssetType Type { get; set; }
 	[JsonPropertyName( "files_hash" )]
 	public string FilesHash { get; set; } = "";
 	public Dictionary<string, string> Authors { get; set; } = new();
