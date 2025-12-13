@@ -1,4 +1,5 @@
 using PolyHaven.API;
+using PolyHaven.Pipeline;
 using System.IO;
 using System.Threading.Tasks;
 namespace PolyHaven;
@@ -26,10 +27,9 @@ public static class Commands
 	[ConCmd("ph_download_hdri")]
 	public static async Task DownloadHdri( string id )
 	{
-		var asset = await PolyHavenApi.GetHdriAsset( id );
-		await asset.DownloadHdr();
-		var mat = asset.GenerateMaterial();
-		await mat.CompileIfNeededAsync();
-		Log.Info("Asset has been compiled!");
+		await AssetCompilePipeline.DoCompile( id, null, false );
 	}
+
+	[ConVar("ph_blender_path", ConVarFlags.Saved)]
+	public static string BlenderPath { get; set; } = "";
 }
