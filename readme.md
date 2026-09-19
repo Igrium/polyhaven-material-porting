@@ -51,5 +51,11 @@ The pipeline works around it with explicit `AssetSystem.RegisterFile` calls at b
 
 With those in place a ported asset is usable in the same session, no restart needed.
 
+A second Linux trap, in the same spirit: `Pixmap.FromFile` prefixes any path without a colon in it
+with the `toolimages:` Qt search path. On Windows an absolute path always has one (`C:\`), on Linux it
+never does, so the thumbnail came back as a pixmap that reported itself fine but silently failed to
+save - the engine then kept its own flat equirect preview. `ThumbnailGenerator.AssignThumbnail`
+decodes the PNG with `Bitmap.CreateFromBytes` and goes through `Pixmap.FromBitmap` instead.
+
 Also: editing this project's C# while the editor is running triggers a hotload that kills the in-editor
 MCP server (and with it the editor). Batch your edits and restart.

@@ -3,24 +3,16 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using FileSystem = Editor.FileSystem;
 namespace PolyHaven;
 
 public class ThumbnailGenerator
 {
-	public static async Task<string> GenerateThumbnail( HdriAsset asset )
+	public static Task<string> GenerateThumbnail( HdriAsset asset )
 	{
 		if ( asset.SourceTexturePath == null )
 			throw new InvalidOperationException( "Source texture has not been downloaded." );
-		var outPath = await GenerateThumbnail( asset.SourceTexturePath, asset.PolyHavenId );
 
-		// Process.Exited fires on a threadpool thread, so we're off the main thread here. Pixmap and
-		// OverrideThumbnail are native calls that won't survive that.
-		await MainThread.Wait();
-
-		if ( asset.SBoxAsset != null )
-			AssignThumbnail( asset.SBoxAsset, outPath );
-		return outPath;
+		return GenerateThumbnail( asset.SourceTexturePath, asset.PolyHavenId );
 	}
 
 	public static async Task<string> GenerateThumbnail( string exrPath, string name )
@@ -37,19 +29,47 @@ public class ThumbnailGenerator
 		await RunBlenderProcess( globalExrPath, globalOutputPath, blendFile );
 
 		Log.Info( "Saved thumbnail to " + outputPath );
-		return outputPath;
+
+		// Absolute, not content-relative. Blender wrote straight to disk and CDirWatcher does nothing
+		// on Linux, so FileSystem.Content can't resolve the path it just created.
+		return globalOutputPath;
 	}
 
 	public static void AssignThumbnail( Asset asset, string thumbPath )
 	{
-		var fullPath = FileSystem.Content.GetFullPath( thumbPath );
-		if ( fullPath == null )
+		// Pixmap and OverrideThumbnail are native calls - they won't survive a threadpool thread.
+		ThreadSafe.AssertIsMainThread();
+
+		if ( !File.Exists( thumbPath ) )
 		{
-			Log.Warning( "Unable to find thumbnail: " + thumbPath );
+			Log.Warning( $"Blender reported success but '{thumbPath}' isn't there - leaving {asset} with the thumbnail the engine renders itself." );
 			return;
 		}
-		Pixmap thumbnail = Pixmap.FromFile( fullPath );
+
+		// Not Pixmap.FromFile - it prefixes anything without a colon in it with the "toolimages:" Qt
+		// search path, which is every absolute path on Linux, and hands back a pixmap that reports
+		// itself fine but fails to save. Decode the bytes ourselves instead.
+		using var bitmap = Bitmap.CreateFromBytes( File.ReadAllBytes( thumbPath ) );
+		if ( bitmap == null )
+		{
+			Log.Warning( $"Couldn't decode thumbnail '{thumbPath}' - leaving {asset} with the thumbnail the engine renders itself." );
+			return;
+		}
+
+		Pixmap thumbnail = Pixmap.FromBitmap( bitmap );
+		if ( thumbnail == null )
+		{
+			Log.Warning( $"Couldn't read thumbnail '{thumbPath}' - leaving {asset} with the thumbnail the engine renders itself." );
+			return;
+		}
+
+		// This only sets Asset.thumbnailOverride, which lives on the Asset object and isn't written
+		// anywhere. The engine persists it for us on the rebuild OverrideThumbnail queues: that render
+		// returns the override and saves it to the thumbnail cache. Anything that makes the engine
+		// rebuild the thumbnail afterwards - compiling the asset, for one - can undo it, so this wants
+		// to be the last thing the pipeline does to the asset.
 		asset.OverrideThumbnail( thumbnail );
+		Log.Info( $"Assigned thumbnail {thumbPath} to {asset}" );
 	}
 
 	protected static async Task RunBlenderProcess( string exrInput, string imageOutput, string blendFile )

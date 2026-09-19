@@ -30,6 +30,16 @@ public static class Commands
 		return Port( id );
 	}
 
+	/// <summary>
+	/// Runs the full HDRI pipeline including publish. Publishing itself still respects
+	/// AssetPublishing.DryRun, so this is safe to run without side effects until that's flipped off.
+	/// </summary>
+	[ConCmd( "ph_test_hdri_pipeline" )]
+	public static Task TestHdriPipeline( string id )
+	{
+		return Guard( id, () => AssetCompilePipeline.DoCompile( id, null, true ) );
+	}
+
 	[ConCmd( "ph_download_texture" )]
 	public static Task DownloadTexture( string id, string res = "2k", string aoRes = "1k" )
 	{

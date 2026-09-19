@@ -81,7 +81,7 @@ public class TextureMaterialAsset : IPolyAsset
 	/// Download all the textures that this material needs.
 	/// </summary>
 	/// <returns>A task that finishes when the textures have downloaded.</returns>
-	public async Task<IEnumerable<string>> DownloadFiles( string resolution = "2k", string aoRes = "1k" )
+	public async Task<IEnumerable<string>> DownloadFiles( string resolution = "2k", string aoRes = "2k" )
 	{
 		if ( DownloadedFiles != null )
 		{

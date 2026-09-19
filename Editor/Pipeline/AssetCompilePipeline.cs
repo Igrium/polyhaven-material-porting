@@ -28,11 +28,19 @@ public static class AssetCompilePipeline
 		// only - AssetSystem.RegisterFile asserts it.
 		await MainThread.Wait();
 
+		// Blender is a separate process, so let it render while the material compiles.
 		var thumbTask = ThumbnailGenerator.GenerateThumbnail( asset );
 		var mat = asset.GenerateMaterial();
 		var compileTask = CompileAsync( mat );
 
-		await Task.WhenAll( thumbTask, compileTask );
+		var thumbPath = await thumbTask;
+		await compileTask;
+
+		// Assign the thumbnail last. Compiling the asset makes the engine rebuild its thumbnail, and
+		// that render happily replaces an override set before it with the flat equirect preview it
+		// draws for a sky material.
+		await MainThread.Wait();
+		ThumbnailGenerator.AssignThumbnail( mat, thumbPath );
 
 		asset.SetupMetadata();
 
