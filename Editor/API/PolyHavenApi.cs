@@ -1,4 +1,3 @@
-using PolyHaven.Assets;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -68,24 +67,6 @@ public static class PolyHavenApi
 		}
 
 		return texList.Value;
-	}
-
-	public static async Task<HdriAsset> GetHdriAsset( string id )
-	{
-		var info = await GetAsset( id );
-		if ( info == null || info.Type != PhAssetType.HDRI )
-			throw new ArgumentException( "The supplied asset must be an HDRI.", nameof( id ) );
-
-		return new HdriAsset( id, info );
-	}
-
-	public static async Task<TextureMaterialAsset> GetTextureAsset( string id )
-	{
-		var info = await GetAsset( id );
-		if ( info == null || info.Type != PhAssetType.Texture )
-			throw new ArgumentException( "The supplied asset must be a texture.", nameof( id ) );
-
-		return new TextureMaterialAsset( id, info );
 	}
 }
 

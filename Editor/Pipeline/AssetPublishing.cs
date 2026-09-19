@@ -19,8 +19,6 @@ public static class AssetPublishing
 		Log.Info( "Publishing " + asset.PolyHavenId );
 		var project = asset.SBoxAsset.Publishing.CreateTemporaryProject();
 		var publisher = await ProjectPublisher.FromAsset( asset.SBoxAsset );
-		publisher.SetMeta( "polyhaven_id", asset.PolyHavenId );
-		publisher.SetMeta("AssetLicense", "CC0");
 		
 		if ( DryRun )
 		{

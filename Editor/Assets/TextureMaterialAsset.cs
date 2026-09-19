@@ -38,8 +38,6 @@ public class TextureMaterialAsset : IPolyAsset
 
 	public Asset? SBoxAsset { get; private set; }
 
-	public string? AssetPartyUrl { get; set; }
-
 	public TextureMaterialAsset( string polyHavenId, PolyHavenAssetInfo info )
 	{
 		if ( info.Type != PhAssetType.Texture )
@@ -182,45 +180,14 @@ public class TextureMaterialAsset : IPolyAsset
 			{ "MetalnessTexture", DownloadedFiles.Metal }
 		} );
 
-		var globalPath = Path.Combine( activeProject.GetAssetsPath(), vmatPath );
-		Directory.CreateDirectory( Path.GetDirectoryName( globalPath )! );
-		File.WriteAllText( globalPath, vmatContents );
-
-		// RegisterFile asserts it's on the main thread, and hands the asset straight back now -
-		// no need for a separate FindByPath.
-		SBoxAsset = AssetSystem.RegisterFile( globalPath ) ?? AssetSystem.FindByPath( vmatPath );
-		if ( SBoxAsset == null )
-			throw new InvalidOperationException( $"Wrote {vmatPath} but the asset system didn't pick it up." );
-
-		Log.Info( $"Wrote material to {SBoxAsset}" );
+		SBoxAsset = PortingUtility.WriteAndRegisterMaterial( vmatPath, vmatContents );
 		return SBoxAsset;
 	}
 
 	public void SetupMetadata()
 	{
-		if ( SBoxAsset == null )
-			throw new InvalidOperationException( "Material has not been generated." );
-
-		SBoxAsset.MetaData.Set( "polyhaven_id", PolyHavenId );
-		SBoxAsset.Publishing.CreateTemporaryProject();
-
-		var tags = new HashSet<string>();
-		foreach ( var tag in Info.Tags )
-			tags.Add( tag );
-		foreach ( var tag in Info.Categories )
-			tags.Add( tag );
-
-		// ProjectConfig no longer carries Tags - modern s&box sets those on the package page - so we
-		// stash the scrape on the asset instead of losing it.
-		SBoxAsset.MetaData.Set( "polyhaven_tags", PortingUtility.ReplaceSpaces( tags ).ToArray() );
-
-		// The engine validates and truncates idents itself now, so we can just hand it the PolyHaven id.
-		SBoxAsset.Publishing.ProjectConfig.Ident = PolyHavenId;
-		SBoxAsset.Publishing.ProjectConfig.Title = Info.Name;
-		SBoxAsset.Publishing.ProjectConfig.Org = "polyhaven";
-		SBoxAsset.Publishing.Save();
-
-		SBoxAsset.MetaData.Set( "PolyAsset", Info );
+		PortingUtility.ApplyStandardMetadata( this );
+		SBoxAsset!.MetaData.Set( "PolyAsset", Info );
 	}
 
 	public override string ToString()
