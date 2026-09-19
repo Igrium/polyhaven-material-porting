@@ -16,18 +16,20 @@ public static class AssetPublishing
 		if ( asset.SBoxAsset == null )
 			throw new InvalidOperationException( "Material has not been generated." );
 
+		Log.Info( "Publishing " + asset.PolyHavenId );
+		var project = asset.SBoxAsset.Publishing.CreateTemporaryProject();
+		var publisher = await ProjectPublisher.FromAsset( asset.SBoxAsset );
+		publisher.SetMeta( "polyhaven_id", asset.PolyHavenId );
+		publisher.SetMeta("AssetLicense", "CC0");
+		
 		if ( DryRun )
 		{
 			Log.Warning( $"[dry run] Skipping publish of {asset.PolyHavenId}. Set AssetPublishing.DryRun = false to upload for real." );
 			return;
 		}
-
-		Log.Info( "Publishing " + asset.PolyHavenId );
-		var project = asset.SBoxAsset.Publishing.CreateTemporaryProject();
-		var publisher = await ProjectPublisher.FromAsset( asset.SBoxAsset );
-		publisher.SetMeta( "polyhaven_id", asset.PolyHavenId );
+		
 		await publisher.PrePublish();
-
+		
 		Log.Info( "Uploading files" );
 
 		// ProjectPublisher does its own batched uploads now, so we don't hand-roll the 8-at-a-time loop.

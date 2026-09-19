@@ -22,6 +22,9 @@ in this repo are what it renders with.
 | `ph_download_hdri <id>` | Port an HDRI into `materials/skybox/`, with a Blender-rendered thumbnail. |
 | `ph_download_texture <id> [res] [aoRes]` | Port a texture set into `materials/<category>/`. Defaults `2k` / `1k`. |
 | `ph_dump_assets` | Dump the PolyHaven asset list to the console. |
+| `ph_listunfinished` | List every PolyHaven HDRI that isn't on asset.party yet. |
+| `ph_masscompile` | Port every one of those, in order, skipping the ones that fail. |
+| `ph_stop` | Ask a running mass compile to stop after the current asset. |
 
 HDRIs and materials run through separate pipelines - `AssetCompilePipeline` handles skyboxes (Blender
 thumbnail, `skybox.template`), `MaterialCompilePipeline` handles PBR materials (category subfolder,
@@ -32,6 +35,23 @@ thumbnail, `skybox.template`), `MaterialCompilePipeline` handles PBR materials (
 Uploads are **stubbed out** while the rewrite is in progress - `AssetPublishing.DryRun` defaults to
 `true`, so `Publish` logs and returns instead of pushing to asset.party. Flip it to `false` once the
 generated packages have been eyeballed.
+
+## Mass porting
+
+`ph_masscompile` walks the output of `ph_listunfinished` and ports each one. Assets whose id or name
+is longer than 32 characters are skipped - they can't have a valid ident - and anything that throws is
+logged to `polyhaven_errors.txt` in the project root so the run carries on to the next asset.
+
+Each ported asset is POSTed to the Java metadata server in `metadata_server/`
+(`http://localhost:8080/submit`), which queues it up so the description can be written by hand. That
+happens whether or not the publish was a dry run, so descriptions can be prepared while uploads are
+still stubbed out - the only difference is `asset_party_url`, which stays null until a real publish
+has given the asset a package. If the server isn't running the post is logged as a warning and the
+port continues.
+
+`AssetMeta`'s property names have to keep matching the `@SerializedName` annotations on
+`metadata_server`'s `AssetMeta`/`AssetEntry` records, and the tags it sends come from the
+`polyhaven_tags` asset metadata, since `ProjectConfig` no longer carries tags.
 
 ## Linux caveat
 

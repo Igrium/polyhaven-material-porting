@@ -78,7 +78,12 @@ public class MetaUI {
 
     @FXML
     protected void openWeb() {
-        AppUI.getInstance().getHostServices().showDocument(asset.assetPartyURL());
+        String url = asset.assetPartyURL();
+        if (url == null) {
+            System.out.println("Asset has no asset.party URL yet.");
+            return;
+        }
+        AppUI.getInstance().getHostServices().showDocument(url);
     }
 
     public void Load(AssetMeta asset) {

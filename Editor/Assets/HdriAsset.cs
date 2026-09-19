@@ -107,6 +107,7 @@ public class HdriAsset : IPolyAsset
 		SBoxAsset.Publishing.ProjectConfig.Ident = PolyHavenId;
 		SBoxAsset.Publishing.ProjectConfig.Title = Info.Name;
 		SBoxAsset.Publishing.ProjectConfig.Org = "polyhaven";
+		SBoxAsset.Publishing.ProjectConfig.SetMeta( "AssetLicense", "CC0" );
 		SBoxAsset.Publishing.Save();
 	}
 

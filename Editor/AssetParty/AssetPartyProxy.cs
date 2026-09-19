@@ -19,4 +19,10 @@ public class AssetPartyProxy
 
 		return packages;
 	}
+
+	public static async Task<bool> PackageExists( string id, IEnumerable<Package>? packages = null )
+	{
+		packages ??= await ExistingPackages();
+		return packages.Select( p => p.Ident ).Contains( id );
+	}
 }

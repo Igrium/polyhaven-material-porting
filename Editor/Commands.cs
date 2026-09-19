@@ -46,6 +46,28 @@ public static class Commands
 		return Guard( id, () => new MaterialCompilePipeline().SetupAsset( id, res, aoRes ) );
 	}
 
+	[ConCmd( "ph_listunfinished" )]
+	public static async Task ListUnfinished()
+	{
+		var unfinished = await AssetCompilePipeline.GetUnfinishedAssets();
+		foreach ( var id in unfinished.Keys )
+		{
+			Log.Info( id );
+		}
+	}
+
+	[ConCmd( "ph_masscompile" )]
+	public static Task MassCompile()
+	{
+		return Guard( "mass compile", AssetCompilePipeline.DoMassCompile );
+	}
+
+	[ConCmd( "ph_stop" )]
+	public static void StopCompile()
+	{
+		AssetCompilePipeline.StopCompile();
+	}
+
 	/// <summary>
 	/// An exception thrown out of an async ConCmd goes nowhere - the console shows nothing at all -
 	/// so catch it here and log it.
