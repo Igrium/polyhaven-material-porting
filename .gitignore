@@ -30,4 +30,5 @@ code/Properties/*
 Exports/
 
 # Don't commit the assets the code is trying to port!
-Assets/
+# Anchored, so it doesn't also swallow Editor/Assets/ (that's source).
+/Assets/

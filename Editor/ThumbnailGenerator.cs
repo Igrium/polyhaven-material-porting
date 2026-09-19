@@ -13,8 +13,13 @@ public class ThumbnailGenerator
 		if ( asset.SourceTexturePath == null )
 			throw new InvalidOperationException( "Source texture has not been downloaded." );
 		var outPath = await GenerateThumbnail( asset.SourceTexturePath, asset.PolyHavenId );
-		if (asset.SBoxAsset != null)
-			AssignThumbnail(asset.SBoxAsset, outPath);
+
+		// Process.Exited fires on a threadpool thread, so we're off the main thread here. Pixmap and
+		// OverrideThumbnail are native calls that won't survive that.
+		await MainThread.Wait();
+
+		if ( asset.SBoxAsset != null )
+			AssignThumbnail( asset.SBoxAsset, outPath );
 		return outPath;
 	}
 
@@ -41,6 +46,7 @@ public class ThumbnailGenerator
 		if ( fullPath == null )
 		{
 			Log.Warning( "Unable to find thumbnail: " + thumbPath );
+			return;
 		}
 		Pixmap thumbnail = Pixmap.FromFile( fullPath );
 		asset.OverrideThumbnail( thumbnail );
@@ -55,13 +61,17 @@ public class ThumbnailGenerator
 
 		var scriptFile = Path.Join( Path.Join( Project.Current.GetRootPath(), "python/render_thumbnail.py" ) );
 
-		string[] arguments = ["-b", blendFile, "--python", scriptFile, "--exr", exrInput, "--output", imageOutput];
+		// Everything after "--" is ours - without it Blender tries to open "--exr" as a .blend and errors.
+		string[] arguments = ["-b", blendFile, "--python", scriptFile, "--", "--exr", exrInput, "--output", imageOutput];
 		
 		var process = new Process();
 		process.StartInfo = new ProcessStartInfo( blenderPath, arguments );
 
 		var result = await RunProcessAsync( process );
 		Log.Info( "Blender process closed with return value " + result );
+
+		if ( result != 0 )
+			throw new InvalidOperationException( $"Blender exited with code {result} - no thumbnail was written." );
 	}
 
 	/// <summary>
